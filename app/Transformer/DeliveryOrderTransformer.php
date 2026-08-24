@@ -58,7 +58,6 @@ class DeliveryOrderTransformer extends TransformerAbstract
             'shipto_name' => $data->shipto_name,
             'shipping_company' => $data->shipping_company,
             'container1_code' => $data->container1_code,
-            'container2_code' => $data->container2_code,
             'transportation' => $data->transportation,
             'is_close' => $data->is_close,
             'status_id' => $data->status_id,

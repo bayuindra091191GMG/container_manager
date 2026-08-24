@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/animate.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/prism.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/flatpickr/flatpickr.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/select2/select2.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/select2.css') }}">
 @endsection
 
 @section('style')
@@ -179,10 +179,10 @@
 
                     <div class="row mb-3">
                         <div class="col-3">
-                            <label class="form-label">CONTAINER 1</label>
+                            <label class="form-label">CONTAINER <span class="text-danger">*</span></label>
                         </div>
                         <div class="col-4">
-                            <select2 :url="containerSelectUrl" v-model="container1_code"
+                            <select2 :url="containerSelectUrl" :tags="true" v-model="container1_code"
                                 :name="'container1_code'" id="container1_code"
                                 class="form-select form-control-select2"
                                 placeholder=" -- SELECT OR TYPE CONTAINER CODE -- ">
@@ -190,18 +190,6 @@
                         </div>
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-3">
-                            <label class="form-label">CONTAINER 2</label>
-                        </div>
-                        <div class="col-4">
-                            <select2 :url="containerSelectUrl" v-model="container2_code"
-                                :name="'container2_code'" id="container2_code"
-                                class="form-select form-control-select2"
-                                placeholder=" -- SELECT OR TYPE CONTAINER CODE -- ">
-                            </select2>
-                        </div>
-                    </div>
 
                     <hr />
 
@@ -325,7 +313,6 @@
                 transportation: '',
                 branch_destination: '',
                 container1_code: '',
-                container2_code: '',
                 detailList: [],
                 itemSelectUrl: '{{ route('delivery_order.item.select2') }}',
                 containerSelectUrl: '{{ route('delivery_order.container.select2') }}'

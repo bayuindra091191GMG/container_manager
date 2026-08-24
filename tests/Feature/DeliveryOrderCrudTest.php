@@ -68,8 +68,6 @@ class DeliveryOrderCrudTest extends TestCase
             $table->string('shipping_company')->nullable();
             $table->unsignedBigInteger('container1_id')->nullable();
             $table->string('container1_code')->nullable();
-            $table->unsignedBigInteger('container2_id')->nullable();
-            $table->string('container2_code')->nullable();
             $table->string('transportation')->nullable();
             $table->unsignedInteger('status_id')->nullable();
             $table->boolean('is_close')->default(false);
@@ -182,7 +180,6 @@ class DeliveryOrderCrudTest extends TestCase
             'transportation' => 'TRUCK',
             'branch_destination' => 2,
             'container1_code' => 'CONT-OLD',
-            'container2_code' => '',
             'details' => [
                 ['item_id' => 1, 'qty' => '10', 'unit' => 'TON'],
                 ['item_id' => 2, 'qty' => '5', 'unit' => 'BOX'],
@@ -246,13 +243,26 @@ class DeliveryOrderCrudTest extends TestCase
         $this->assertCount(1, DB::table('do_headers')->where('code', 'DO-MANUAL-1')->get());
     }
 
-    public function test_store_rejects_identical_container_codes(): void
+    public function test_store_requires_one_container(): void
     {
-        $response = $this->storeDo(['container1_code' => 'CONT-X', 'container2_code' => 'CONT-X']);
+        $response = $this->storeDo([
+            'container1_code' => '',
+            'container2_code' => 'CONT-X',
+        ]);
 
         $payload = json_decode($response->getContent(), true);
         $this->assertSame('validation_failed', $payload['error']);
         $this->assertCount(0, DB::table('do_headers')->where('code', 'DO-MANUAL-1')->get());
+    }
+
+    public function test_store_ignores_legacy_container2_input(): void
+    {
+        $response = $this->storeDo(['container2_code' => 'CONT-IGNORED']);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $header = DB::table('do_headers')->where('code', 'DO-MANUAL-1')->first();
+        $this->assertSame('CONT-OLD', $header->container1_code);
+        $this->assertSame(1, DB::table('container_datas')->count());
     }
 
     public function test_store_requires_at_least_one_detail_row(): void
@@ -302,7 +312,6 @@ class DeliveryOrderCrudTest extends TestCase
             'transportation' => 'TRUCK',
             'branch_destination' => 2,
             'container1_code' => 'CONT-OLD',
-            'container2_code' => '',
             'details' => [
                 ['item_id' => 1, 'qty' => '20', 'unit' => 'TON'],
             ],
@@ -327,7 +336,6 @@ class DeliveryOrderCrudTest extends TestCase
 
         $this->assertSame('CONT-OLD', $header->container1_code);
         $this->assertSame($container->id, $header->container1_id);
-        $this->assertNull($header->container2_code);
     }
 
     public function test_void_marks_open_do_as_voided(): void
@@ -379,7 +387,7 @@ class DeliveryOrderCrudTest extends TestCase
         $headerId = DB::table('do_headers')->where('code', 'DO-MANUAL-1')->value('id');
         DB::table('do_headers')->where('id', $headerId)->update(['is_close' => 1]);
 
-        $this->storeDo(['code' => 'DO-VOIDED', 'container1_code' => '', 'container2_code' => '']);
+        $this->storeDo(['code' => 'DO-VOIDED', 'container1_code' => 'CONT-VOIDED']);
         $voidedId = DB::table('do_headers')->where('code', 'DO-VOIDED')->value('id');
         DB::table('do_headers')->where('id', $voidedId)->update(['status_id' => 21]);
 
@@ -406,7 +414,7 @@ class DeliveryOrderCrudTest extends TestCase
         $this->storeDo();
         $headerId = DB::table('do_headers')->where('code', 'DO-MANUAL-1')->value('id');
         DB::table('do_headers')->where('id', $headerId)->update(['is_close' => 1]);
-        $this->storeDo(['code' => 'DO-OPEN', 'container1_code' => '', 'container2_code' => '']);
+        $this->storeDo(['code' => 'DO-OPEN', 'container1_code' => 'CONT-OPEN']);
 
         $openRows = $this->datatableDo(['status' => 0]);
         $this->assertSame(['DO-OPEN'], array_column($openRows, 'code'));
@@ -418,7 +426,7 @@ class DeliveryOrderCrudTest extends TestCase
     public function test_do_select2_excludes_multi_line_dos(): void
     {
         $this->storeDo();
-        $this->storeDo(['code' => 'DO-SINGLE', 'container1_code' => '', 'container2_code' => '', 'details' => [
+        $this->storeDo(['code' => 'DO-SINGLE', 'container1_code' => 'CONT-SINGLE', 'details' => [
             ['item_id' => 1, 'qty' => '3', 'unit' => 'TON'],
         ]]);
 
@@ -443,6 +451,20 @@ class DeliveryOrderCrudTest extends TestCase
 
         $this->assertSame(400, $response->getStatusCode());
         $this->assertArrayHasKey('error', json_decode($response->getContent(), true));
+    }
+
+    public function test_get_container_data_returns_only_container1(): void
+    {
+        $this->storeDo(['details' => [
+            ['item_id' => 1, 'qty' => '3', 'unit' => 'TON'],
+        ]]);
+        $doId = DB::table('do_headers')->where('code', 'DO-MANUAL-1')->value('id');
+
+        $request = Request::create('/delivery_order/container/get', 'POST', ['do_id' => $doId]);
+        $payload = json_decode(app(DeliveryOrderController::class)->getContainerData($request)->getContent(), true);
+
+        $this->assertSame('CONT-OLD', $payload['container1']);
+        $this->assertArrayNotHasKey('container2', $payload);
     }
 
     public function test_get_container_data_rejects_voided_do(): void
@@ -481,7 +503,7 @@ class DeliveryOrderCrudTest extends TestCase
 
     public function test_edit_detail_list_contains_item_select_extra(): void
     {
-        $this->storeDo(['container1_code' => '', 'container2_code' => '', 'details' => [
+        $this->storeDo(['container1_code' => 'CONT-EDIT', 'details' => [
             ['item_id' => 1, 'qty' => '3', 'unit' => 'TON'],
         ]]);
         $headerId = DB::table('do_headers')->where('code', 'DO-MANUAL-1')->value('id');

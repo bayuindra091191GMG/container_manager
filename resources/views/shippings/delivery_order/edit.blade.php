@@ -174,14 +174,6 @@
                         </div>
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-3">
-                            <label class="form-label">CONTAINER 2</label>
-                        </div>
-                        <div class="col-4">
-                            <input type="text" class="form-control" value="{{ $doHeader->container2_code }}" readonly>
-                        </div>
-                    </div>
 
                     <hr />
 

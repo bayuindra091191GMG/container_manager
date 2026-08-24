@@ -216,7 +216,6 @@
                 { data: 'shipping_company', name: 'do_headers.shipping_company', class: 'text-center' },
                 { data: 'shipto_name', name: 'do_headers.shipto_name', class: 'text-center' },
                 { data: 'container1_code', name: 'do_headers.container1_code', class: 'text-center' },
-                { data: 'container2_code', name: 'do_headers.container2_code', class: 'text-center' },
                 { data: 'transportation', name: 'do_headers.transportation', class: 'text-center' },
                 { data: 'is_close', name: 'do_headers.is_close', class: 'text-center', searchable: false,
                     render: function ( data, type, row ){

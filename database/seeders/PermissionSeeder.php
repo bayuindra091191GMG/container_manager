@@ -67,6 +67,10 @@ class PermissionSeeder extends Seeder
         'si.document-upload',
         'si.document-delete',
         'container.list',
+        'container.add',
+        'container.show',
+        'container.edit',
+        'container.delete',
         'warehouse_management.list',
         'warehouse_management.show',
     ];

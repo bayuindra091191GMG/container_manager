@@ -179,8 +179,7 @@
                                                         <th>CONSIGNEE</th>
                                                         <th>SO NO</th>
                                                         <th>SHIP NAME</th>
-                                                        <th>CONTAINER1</th>
-                                                        <th>CONTAINER2</th>
+                                                        <th>CONTAINER</th>
                                                         <th>QTY</th>
                                                         <th>UNIT</th>
                                                         <th>REMARK</th>
@@ -232,9 +231,6 @@
                                                         <td>
                                                             <span>@{{ detail.container1 }}</span>
                                                         </td>
-                                                        <td>
-                                                            <span>@{{ detail.container2 }}</span>
-                                                        </td>
                                                         <td v-if="detail.do_type == 'default'"></td>
                                                         <td v-if="detail.do_type == 'transfer'">
                                                             <vue-autonumeric :options="qtyAutonumericFormat"
@@ -264,7 +260,7 @@
                                                                 Add New
                                                             </button>
                                                         </td> --}}
-                                                        <td colspan="9" class="text-center">
+                                                        <td colspan="11" class="text-center">
                                                             <button type="button" class="btn btn-success btn-sm"
                                                                 v-on:click="copyLastRow()">
                                                                 <i class="fa fa-plus"></i>
@@ -356,9 +352,9 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td>
-                                                                            <select2 :url="detail.consignee_select_url" v-model="detail.trucking_1"
-                                                                                :name="'detailsWt[' + index + '][trucking_1]'"
-                                                                                :id="'consignee_select_'+index" :value="detail.trucking_1"
+                                                                            <select2 :url="detail.consignee_select_url" v-model="detail.trucking"
+                                                                                :name="'detailsWt[' + index + '][trucking]'"
+                                                                                :id="'consignee_select_'+index" :value="detail.trucking"
                                                                                 :data-index="index" class="form-select form-control-select2"
                                                                                 placeholder=" -- SELECT TRUCKING COMPANY -- ">
                                                                             </select2>
@@ -376,48 +372,15 @@
                                                                         </td>
                                                                         <td>
                                                                             <vue-autonumeric :options="qtyAutonumericFormat"
-                                                                                :name="'detailsWt[' + index + '][real_qty_1]'" class="form-control text-end"
-                                                                                :value="detail.real_qty_1" style="width: 100px;"></vue-autonumeric>
+                                                                                :name="'detailsWt[' + index + '][real_qty]'" class="form-control text-end"
+                                                                                :value="detail.real_qty" style="width: 100px;"></vue-autonumeric>
                                                                         </td>
                                                                         <td>
                                                                             <span>@{{ detail.unit }}</span>
                                                                         </td>
                                                                         <td>
                                                                             <input type="text" class="form-control" style="width: 250px;"
-                                                                                :name="'detailsWt[' + index + '][remark_1]'" />
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <select2 :url="detail.consignee_select_url" v-model="detail.trucking_2"
-                                                                                :name="'detailsWt[' + index + '][trucking_2]'"
-                                                                                :id="'consignee_select_'+index" :value="detail.trucking_2"
-                                                                                :data-index="index" class="form-select form-control-select2"
-                                                                                placeholder=" -- SELECT TRUCKING COMPANY -- ">
-                                                                            </select2>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>@{{ detail.so_no }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <input type="hidden" v-model="detail.shipto_name"
-                                                                                :name="'detailsWt[' + index + '][shipto_name]'" />
-                                                                            <span>@{{ detail.shipto_name }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>@{{ detail.container2 }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <vue-autonumeric :options="qtyAutonumericFormat"
-                                                                                :name="'detailsWt[' + index + '][real_qty_2]'" class="form-control text-end"
-                                                                                :value="detail.real_qty_2" style="width: 100px;"></vue-autonumeric>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>@{{ detail.unit }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <input type="text" class="form-control" style="width: 250px;"
-                                                                                :name="'detailsWt[' + index + '][remark_2]'" />
+                                                                                :name="'detailsWt[' + index + '][remark]'" />
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -593,7 +556,6 @@
                         so_no: '',
                         shipto_name: '',
                         container1: '',
-                        container2: '',
                         consignee_select_url: consigneeSelectUrl,
                         // do_select_url: doSelectUrl,
                         do_type: 'default',
@@ -620,7 +582,7 @@
                                 do_id: app.select_do_id_wt
                             }
                         }).then(function (result){
-                            let realQty = result.qty / 2;
+                            let realQty = result.qty;
 
                             let consigneeSelectUrl = '{{ route('consignee.select2') }}';
                             if(app.destination){
@@ -635,16 +597,13 @@
                                 do_id: result.do_id,
                                 do_code: result.do_code,
                                 delivery_type: 'default',
-                                trucking_1: '',
-                                trucking_2: '',
+                                trucking: '',
                                 so_no: result.so_no,
                                 shipto_name: result.shipto_name,
                                 container1: result.container1,
-                                container2: result.container2,
                                 consignee_select_url: consigneeSelectUrl,
                                 do_type: 'transfer',
-                                real_qty_1: result.qty / 2,
-                                real_qty_2: result.qty / 2,
+                                real_qty: realQty,
                                 unit: result.unit
                             })
 
@@ -674,7 +633,6 @@
                             so_no: '',
                             shipto_name: '',
                             container1: '',
-                            container2: '',
                             consignee_select_url: lastRow.consignee_select_url,
                             // do_select_url: lastRow.do_select_url,
                             do_type: 'default',
@@ -704,7 +662,6 @@
                             }
                         }).then(function (result){
                             app.detailList[index].container1 = result.container1;
-                            app.detailList[index].container2 = result.container2;
                             app.detailList[index].shipto_name = result.shipto_name;
                             app.detailList[index].so_no = result.so_no;
                             app.detailList[index].do_type = result.do_type;

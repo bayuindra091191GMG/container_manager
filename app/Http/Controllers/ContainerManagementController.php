@@ -13,6 +13,193 @@ use Rap2hpoutre\FastExcel\FastExcel;
 
 class ContainerManagementController extends Controller
 {
+    public function create()
+    {
+        return view('trx_warehouse.container.create', [
+            'branches' => $this->accessibleBranches(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:255', 'unique:container_datas,code'],
+            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+        ]);
+
+        $branchId = (int) $validated['branch_id'];
+        $this->assertBranchAccess($branchId);
+
+        $container = new ContainerData;
+        $container->branch_id = $branchId;
+        $container->code = strtoupper(trim($validated['code']));
+        $container->status_id = 7;
+        $container->warehouse_location_id = 13;
+        $container->warehouse_location_status = 'ON DELIVERY';
+        $container->warehouse_area = 'B';
+        $container->warehouse_area_row = 'B1';
+        $container->warehouse_status_id = 3;
+        $container->warehouse_status = 'FULL';
+        $container->is_over_storage = false;
+        $container->is_over_demurrage = false;
+        $container->is_storage_monitor_start = false;
+        $container->is_storage_monitor_end = false;
+        $container->is_demurrage_monitor_start = false;
+        $container->is_demurrage_monitor_end = false;
+        $container->is_sync = false;
+        $container->created_by = Auth::id();
+        $container->updated_by = Auth::id();
+        $container->save();
+
+        return redirect()
+            ->route('container.show', $container->id)
+            ->with('success', 'Container created successfully!');
+    }
+
+    public function show($id)
+    {
+        $container = $this->visibleContainer($id);
+        $branch = $container->branch_id
+            ? DB::table('branches')->find($container->branch_id)
+            : null;
+
+        return view('trx_warehouse.container.show', [
+            'container' => $container,
+            'branch' => $branch,
+            'canEdit' => $this->isMutable($container),
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $container = $this->visibleContainer($id);
+
+        if (! $this->isMutable($container)) {
+            return redirect()
+                ->route('container.show', $container->id)
+                ->withErrors(['Container is already linked or operational and cannot be edited.']);
+        }
+
+        return view('trx_warehouse.container.edit', [
+            'container' => $container,
+            'branches' => $this->accessibleBranches(),
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $container = $this->visibleContainer($request->integer('id'));
+
+        if (! $this->isMutable($container)) {
+            return redirect()
+                ->route('container.show', $container->id)
+                ->withErrors(['Container is already linked or operational and cannot be edited.']);
+        }
+
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+            'code' => ['required', 'string', 'max:255', 'unique:container_datas,code,'.$container->id],
+            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+        ]);
+
+        $branchId = (int) $validated['branch_id'];
+        $this->assertBranchAccess($branchId);
+
+        $container->code = strtoupper(trim($validated['code']));
+        $container->branch_id = $branchId;
+        $container->updated_by = Auth::id();
+        $container->save();
+
+        return redirect()
+            ->route('container.show', $container->id)
+            ->with('success', 'Container updated successfully!');
+    }
+
+    public function delete(Request $request)
+    {
+        $container = $this->visibleContainer($request->integer('id'));
+
+        if (! $this->isMutable($container)) {
+            return redirect()
+                ->route('container.show', $container->id)
+                ->withErrors(['Linked or operational containers cannot be deleted.']);
+        }
+
+        $container->status_id = 2;
+        $container->updated_by = Auth::id();
+        $container->save();
+
+        return redirect()
+            ->route('container')
+            ->with('success', 'Container deleted successfully!');
+    }
+
+    private function accessibleBranches()
+    {
+        $query = DB::table('branches')->orderBy('name');
+        $branchIds = $this->branchIdsForUser();
+
+        if ($branchIds !== []) {
+            $query->whereIn('id', $branchIds);
+        }
+
+        return $query->get();
+    }
+
+    private function branchIdsForUser(): array
+    {
+        $user = Auth::user();
+
+        if ($user->isSuperAdmin()) {
+            return [];
+        }
+
+        return collect([$user->branch_id])
+            ->merge($user->branches->pluck('id'))
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function assertBranchAccess(int $branchId): void
+    {
+        if (! Auth::user()->isSuperAdmin() && ! in_array($branchId, $this->branchIdsForUser(), true)) {
+            abort(403);
+        }
+    }
+
+    private function visibleContainer($id): ContainerData
+    {
+        $container = ContainerData::findOrFail($id);
+
+        if (Auth::user()->isSuperAdmin()) {
+            return $container;
+        }
+
+        $effectiveBranchId = $container->si_destination_id ?: $container->branch_id;
+        if (! in_array((int) $effectiveBranchId, $this->branchIdsForUser(), true)) {
+            abort(404);
+        }
+
+        return $container;
+    }
+
+    private function isMutable(ContainerData $container): bool
+    {
+        return (int) $container->status_id === 7
+            && empty($container->do_id)
+            && empty($container->si_code)
+            && empty($container->timbangan_id)
+            && ! DB::table('shipping_instruction_monitors')
+                ->where('container_id', $container->id)
+                ->exists()
+            && ! DB::table('container_histories')
+                ->where('code', $container->code)
+                ->exists();
+    }
+
     public function exportList(Request $request)
     {
         try {

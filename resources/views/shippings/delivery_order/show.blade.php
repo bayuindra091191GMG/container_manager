@@ -126,12 +126,10 @@
 
                 <div class="row mb-3">
                     <div class="col-3">
-                        <label class="form-label fw-bold">CONTAINERS</label>
+                        <label class="form-label fw-bold">CONTAINER</label>
                     </div>
                     <div class="col-9">
                         <span>{{ $doHeader->container1_code ?: '-' }}</span>
-                        &nbsp;/&nbsp;
-                        <span>{{ $doHeader->container2_code ?: '-' }}</span>
                     </div>
                 </div>
 

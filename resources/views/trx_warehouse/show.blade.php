@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Show Container Detail')
@@ -176,8 +175,7 @@
                                         <th>DELIVERY TYPE</th>
                                         <th>CONSIGNEE</th>
                                         <th>SHIP NAME</th>
-                                        <th>CONTAINER1</th>
-                                        <th>CONTAINER2</th>
+                                        <th>CONTAINER</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -196,9 +194,6 @@
                                         </td>
                                         <td>
                                             <span>@{{ detail.container1 }}</span>
-                                        </td>
-                                        <td>
-                                            <span>@{{ detail.container2 }}</span>
                                         </td>
                                     </tr>
                                 </tbody>

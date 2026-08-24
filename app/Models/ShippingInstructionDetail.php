@@ -36,69 +36,61 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $transportation
  * @property int|null $container1_id
  * @property string|null $container1_code
- * @property int|null $container2_id
- * @property string|null $container2_code
  * @property Carbon|null $created_at
  * @property int|null $created_by
  * @property Carbon|null $updated_at
  * @property int|null $updated_by
  * @property string|null $remark
- *
  * @property ShippingInstructionHeader|null $shipping_instruction_header
- *
- * @package App\Models
  */
 class ShippingInstructionDetail extends Model
 {
-	protected $table = 'shipping_instruction_details';
+    protected $table = 'shipping_instruction_details';
 
-	protected $casts = [
-		'branch_id' => 'int',
-		'header_id' => 'int',
-		'consignee_id' => 'int',
-		'do_id' => 'int',
-		'item_id' => 'int',
-		'qty' => 'float',
-		'real_qty' => 'float',
-		'container1_id' => 'int',
-		'container2_id' => 'int',
-		'created_by' => 'int',
-		'updated_by' => 'int'
-	];
+    protected $casts = [
+        'branch_id' => 'int',
+        'header_id' => 'int',
+        'consignee_id' => 'int',
+        'do_id' => 'int',
+        'item_id' => 'int',
+        'qty' => 'float',
+        'real_qty' => 'float',
+        'container1_id' => 'int',
+        'created_by' => 'int',
+        'updated_by' => 'int',
+    ];
 
-	protected $fillable = [
-		'branch_id',
-		'header_id',
-		'header_code',
-		'consignee_id',
-		'consignee_code',
-		'trucking',
-		'delivery_type',
-		'do_id',
-		'do_code',
-		'do_type',
+    protected $fillable = [
+        'branch_id',
+        'header_id',
+        'header_code',
+        'consignee_id',
+        'consignee_code',
+        'trucking',
+        'delivery_type',
+        'do_id',
+        'do_code',
+        'do_type',
         'so_code',
-		'dr_code',
-		'shipto_code',
-		'shipto_name',
-		'item_id',
-		'item_code',
-		'item_name',
-		'qty',
-		'real_qty',
-		'unit',
+        'dr_code',
+        'shipto_code',
+        'shipto_name',
+        'item_id',
+        'item_code',
+        'item_name',
+        'qty',
+        'real_qty',
+        'unit',
         'transportation',
-		'container1_id',
-		'container1_code',
-		'container2_id',
-		'container2_code',
-		'created_by',
-		'updated_by',
-        'remark'
-	];
+        'container1_id',
+        'container1_code',
+        'created_by',
+        'updated_by',
+        'remark',
+    ];
 
-	public function shipping_instruction_header()
-	{
-		return $this->belongsTo(ShippingInstructionHeader::class, 'header_id');
-	}
+    public function shipping_instruction_header()
+    {
+        return $this->belongsTo(ShippingInstructionHeader::class, 'header_id');
+    }
 }

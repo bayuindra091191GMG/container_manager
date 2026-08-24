@@ -1,6 +1,6 @@
 
 Vue.component('select2', {
-    props: ['options', 'value', 'url', 'placeholder', 'extra', 'selected_item', 'value'],
+    props: ['options', 'value', 'url', 'placeholder', 'extra', 'selected_item', 'tags'],
     template: '#select2-template',
     data: function () {
         var thisVal = this;
@@ -9,7 +9,6 @@ Vue.component('select2', {
                 url: this.url,
                 dataType: 'json',
                 delay: 250,
-                tags: true,
                 data: function (params) {
                     if (params === undefined || params === null) return this.extra;
                     if (thisVal.extra !== undefined) {
@@ -41,6 +40,21 @@ Vue.component('select2', {
                     placeholder: {
                         id: "-1",
                         text: vm.placeholder
+                    },
+                    tags: vm.tags === true || vm.tags === 'true',
+                    createTag: function (params) {
+                        var term = $.trim(params.term);
+                        if (term === '') {
+                            return null;
+                        }
+
+                        term = term.toUpperCase();
+
+                        return {
+                            id: term,
+                            text: term,
+                            newTag: true
+                        };
                     },
                     width: '100%',
                     ajax: vm.ajaxOptions

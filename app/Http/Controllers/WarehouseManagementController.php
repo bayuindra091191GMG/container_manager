@@ -197,9 +197,13 @@ class WarehouseManagementController extends Controller
             ->leftJoin('statuses', 'container_datas.status_id', '=', 'statuses.id')
             ->select(
                 'container_datas.id as id',
+                'container_datas.branch_id as branch_id',
+                'container_datas.do_id as do_id',
+                'container_datas.timbangan_id as timbangan_id',
                 'container_datas.code as code',
                 'container_datas.do_code as do_code',
                 'container_datas.timbangan_code as timbangan_code',
+                'container_datas.si_code as si_code',
                 'container_datas.warehouse_location_status as warehouse_location_status',
                 'container_datas.warehouse_status as warehouse_status',
                 'container_datas.warehouse_area as warehouse_area',
@@ -233,8 +237,7 @@ class WarehouseManagementController extends Controller
                 DB::raw('TIMESTAMPDIFF(SECOND, NOW(), container_datas.free_storage_end_at) AS free_storage_time_limit'),
                 DB::raw('TIMESTAMPDIFF(SECOND, NOW(), container_datas.free_demurrage_end_at) AS free_demurrage_time_limit')
             )
-            ->where('container_datas.status_id', '!=', 2)
-            ->whereNotNull('container_datas.si_destination_id');
+            ->where('container_datas.status_id', '!=', 2);
 
         if ($request->filled('warning')) {
             $filterWarning = $request->input('warning');
@@ -282,24 +285,46 @@ class WarehouseManagementController extends Controller
                 ->whereBetween('container_datas.si_etd_date', [$start->toDateTimeString(), $end->toDateTimeString()]);
         }
 
+        $branchIds = [];
         if (! $admin->isSuperAdmin()) {
-            $branchIdArr[] = $admin->branch_id;
+            $branchIds[] = (int) $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
-                $branchIdArr[] = $adminBranch->id;
+                $branchIds[] = (int) $adminBranch->id;
+            }
+            $branchIds = array_values(array_unique(array_filter($branchIds)));
+        }
+
+        $applyBranchScope = function ($query, array $scopeBranchIds): void {
+            if ($scopeBranchIds === []) {
+                $query->whereRaw('1 = 0');
+
+                return;
             }
 
-            if ($request->get('destination') && $request->get('destination') > 0) {
-                if (! in_array($request->get('destination'), $branchIdArr)) {
-                    $data = $data->whereIn('container_datas.si_destination_id', $branchIdArr);
-                } else {
-                    $data = $data->where('container_datas.si_destination_id', '=', $request->get('destination'));
+            $query->where(function ($scope) use ($scopeBranchIds): void {
+                foreach (array_values($scopeBranchIds) as $index => $branchId) {
+                    $method = $index === 0 ? 'where' : 'orWhere';
+                    $scope->{$method}(function ($branch) use ($branchId): void {
+                        $branch->where('container_datas.si_destination_id', $branchId)
+                            ->orWhere(function ($unassigned) use ($branchId): void {
+                                $unassigned->whereNull('container_datas.si_destination_id')
+                                    ->where('container_datas.branch_id', $branchId);
+                            });
+                    });
                 }
-            } else {
-                $data = $data->whereIn('container_datas.si_destination_id', $branchIdArr);
+            });
+        };
+
+        $requestedDestination = (int) $request->get('destination');
+        if ($admin->isSuperAdmin()) {
+            if ($requestedDestination > 0) {
+                $applyBranchScope($data, [$requestedDestination]);
             }
         } else {
-            if ($request->get('destination') && $request->get('destination') > 0) {
-                $data = $data->where('container_datas.si_destination_id', '=', $request->get('destination'));
+            if ($requestedDestination > 0 && in_array($requestedDestination, $branchIds, true)) {
+                $applyBranchScope($data, [$requestedDestination]);
+            } else {
+                $applyBranchScope($data, $branchIds);
             }
         }
 
@@ -699,7 +724,6 @@ class WarehouseManagementController extends Controller
         //         'trucking' => $detail->trucking,
         //         'shipto_name' => $detail->shipto_name,
         //         'container1' => $detail->do_header->container1_code ?? '',
-        //         'container2' => $detail->do_header->container2_code ?? ''
         //     ];
         // }
         $brokenImageContainerNo = '';

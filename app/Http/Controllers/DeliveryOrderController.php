@@ -299,6 +299,7 @@ class DeliveryOrderController extends Controller
                 'type' => 'required|in:delivery_order,transfer',
                 'date' => 'required',
                 'branch_destination' => 'required|integer|exists:branches,id',
+                'container1_code' => 'required|string|max:200',
                 'details' => 'required|array|min:1',
                 'details.*.item_id' => 'required|integer|exists:items,id',
                 'details.*.qty' => 'required|numeric|min:0',
@@ -314,14 +315,6 @@ class DeliveryOrderController extends Controller
             }
 
             $container1Code = strtoupper(trim((string) $request->input('container1_code', '')));
-            $container2Code = strtoupper(trim((string) $request->input('container2_code', '')));
-            if ($container1Code !== '' && $container1Code === $container2Code) {
-                return response()->json([
-                    'code' => 400,
-                    'error' => 'validation_failed',
-                    'result' => ['Container 1 and Container 2 must be different!'],
-                ], 200);
-            }
 
             DB::beginTransaction();
 
@@ -344,8 +337,7 @@ class DeliveryOrderController extends Controller
             $newDoHeader->updated_by = Auth::id();
             $newDoHeader->save();
 
-            $this->linkContainerToDo($newDoHeader, 1, $container1Code);
-            $this->linkContainerToDo($newDoHeader, 2, $container2Code);
+            $this->linkContainerToDo($newDoHeader, $container1Code);
 
             foreach ($request->input('details') as $detail) {
                 $item = Item::find(intval($detail['item_id']));
@@ -385,14 +377,11 @@ class DeliveryOrderController extends Controller
         }
     }
 
-    private function linkContainerToDo(DoHeader $doHeader, int $position, string $containerCode): void
+    private function linkContainerToDo(DoHeader $doHeader, string $containerCode): void
     {
-        $idField = 'container'.$position.'_id';
-        $codeField = 'container'.$position.'_code';
-
         if ($containerCode === '') {
-            $doHeader->{$idField} = null;
-            $doHeader->{$codeField} = null;
+            $doHeader->container1_id = null;
+            $doHeader->container1_code = null;
 
             return;
         }
@@ -439,8 +428,8 @@ class DeliveryOrderController extends Controller
             $existingContainer->item_name = null;
             $existingContainer->save();
 
-            $doHeader->{$idField} = $existingContainer->id;
-            $doHeader->{$codeField} = $existingContainer->code;
+            $doHeader->container1_id = $existingContainer->id;
+            $doHeader->container1_code = $existingContainer->code;
 
             return;
         }
@@ -454,8 +443,8 @@ class DeliveryOrderController extends Controller
         $newContainer->warehouse_location_status = 'DOORING';
         $newContainer->save();
 
-        $doHeader->{$idField} = $newContainer->id;
-        $doHeader->{$codeField} = $newContainer->code;
+        $doHeader->container1_id = $newContainer->id;
+        $doHeader->container1_code = $newContainer->code;
     }
 
     public function select2Item(Request $request)
@@ -629,7 +618,9 @@ class DeliveryOrderController extends Controller
         }
 
         $doHeaders = DB::table('do_headers')
-            ->where('status_id', '!=', 21);
+            ->where('status_id', '!=', 21)
+            ->whereNotNull('container1_code')
+            ->where('container1_code', '<>', '');
 
         // SI consumption assumes a single detail row per DO; only offer
         // single-line DOs until the SI side carries multiple item lines.
@@ -709,7 +700,6 @@ class DeliveryOrderController extends Controller
                 'do_id' => $doHeader->id,
                 'do_code' => $doHeader->code,
                 'container1' => $doHeader->container1_code ?? '',
-                'container2' => $doHeader->container2_code ?? '',
                 'shipto_name' => $doHeader->shipto_name,
                 'so_no' => $doHeader->so_code,
                 'do_type' => $doHeader->type,

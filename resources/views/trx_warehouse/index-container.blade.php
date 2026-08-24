@@ -125,11 +125,15 @@
 
         <div class="card">
             <div class="card-body">
-                {{-- <div class="row mb-2 justify-content-end">
+                <div class="row mb-2 justify-content-end">
                     <div class="col-auto">
-                        <a class="btn btn-primary" href="{{ route('trx_warehouse.create') }}"><i class="fa fa-fw fa-plus"></i></a>
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->can('container.add'))
+                            <a class="btn btn-primary btn-sm" href="{{ route('container.create') }}">
+                                <i class="fa fa-fw fa-plus"></i> Add Container
+                            </a>
+                        @endif
                     </div>
-                </div> --}}
+                </div>
                 <div class="row mb-2">
                     <div class="col-sm-3 col-12">
                         <label class="form-label" for="start_date">ETD Start</label>
@@ -212,6 +216,7 @@
                                     <th class="text-center">RETURN TO DEPO</th>
                                     <th class="text-center">WARNING</th>
                                     <th class="text-center">DAYS SINCE BERTHING</th>
+                                    <th class="text-center">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -449,6 +454,7 @@
                     searchable: false,
                     orderable: false
                 },
+                { data: 'action', name: 'action', class: 'text-center', searchable: false, orderable: false },
             ]
         });
 

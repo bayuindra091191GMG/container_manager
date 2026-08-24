@@ -208,7 +208,6 @@ class DashboardController extends Controller
                     'do_headers.shipto_code as shipto_code',
                     'do_headers.shipto_name as shipto_name',
                     'do_headers.container1_code as container1_code',
-                    'do_headers.container2_code as container2_code',
                     'do_details.item_code as item_code',
                     'do_details.item_name as item_name',
                     'do_details.unit as unit',

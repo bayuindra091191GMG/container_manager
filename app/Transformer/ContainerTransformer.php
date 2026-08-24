@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Transformer;
 
 use Carbon\Carbon;
@@ -9,18 +8,38 @@ use League\Fractal\TransformerAbstract;
 
 class ContainerTransformer extends TransformerAbstract
 {
-    public function transform($container){
+    public function transform($container)
+    {
         $date = Carbon::parse($container->created_at)->toIso8601String();
-        $etdDate = !empty($container->si_etd_date) ? Carbon::parse($container->si_etd_date)->toIso8601String() : '';
-        $etaDate = !empty($container->si_eta_date) ? Carbon::parse($container->si_eta_date)->toIso8601String() : '';
-        $berthingDate = !empty($container->berthing_at) ? Carbon::parse($container->berthing_at)->toIso8601String() : '';
-        $dooringDate = !empty($container->dooring_at) ? Carbon::parse($container->dooring_at)->toIso8601String() : '';
-        $receivedDate = !empty($container->received_at) ? Carbon::parse($container->received_at)->toIso8601String() : '';
-        $semenOutDate = !empty($container->semen_out_at) ? Carbon::parse($container->semen_out_at)->toIso8601String() : '';
-        $ceramicReceivedAt = !empty($container->ceramic_received_at) ? Carbon::parse($container->ceramic_received_at)->toIso8601String() : '';
-        $returnedDate = !empty($container->returned_at) ? Carbon::parse($container->returned_at)->toIso8601String() : '';
+        $etdDate = ! empty($container->si_etd_date) ? Carbon::parse($container->si_etd_date)->toIso8601String() : '';
+        $etaDate = ! empty($container->si_eta_date) ? Carbon::parse($container->si_eta_date)->toIso8601String() : '';
+        $berthingDate = ! empty($container->berthing_at) ? Carbon::parse($container->berthing_at)->toIso8601String() : '';
+        $dooringDate = ! empty($container->dooring_at) ? Carbon::parse($container->dooring_at)->toIso8601String() : '';
+        $receivedDate = ! empty($container->received_at) ? Carbon::parse($container->received_at)->toIso8601String() : '';
+        $semenOutDate = ! empty($container->semen_out_at) ? Carbon::parse($container->semen_out_at)->toIso8601String() : '';
+        $ceramicReceivedAt = ! empty($container->ceramic_received_at) ? Carbon::parse($container->ceramic_received_at)->toIso8601String() : '';
+        $returnedDate = ! empty($container->returned_at) ? Carbon::parse($container->returned_at)->toIso8601String() : '';
+        $mutable = (int) $container->status_id === 7
+            && empty($container->do_id)
+            && empty($container->si_code)
+            && empty($container->timbangan_id);
 
-        return[
+        $action = '';
+        if (Auth::user()->can('container.show')) {
+            $action .= '<a class="btn btn-xs btn-info me-1" href="'.route('container.show', $container->id).'">View</a>';
+        }
+        if ($mutable && Auth::user()->can('container.edit')) {
+            $action .= '<a class="btn btn-xs btn-secondary me-1" href="'.route('container.edit', $container->id).'">Edit</a>';
+        }
+        if ($mutable && Auth::user()->can('container.delete')) {
+            $action .= '<form method="POST" action="'.route('container.delete').'" class="d-inline" onsubmit="return confirm(\'Delete this container?\')">'
+                .'<input type="hidden" name="_token" value="'.csrf_token().'">'
+                .'<input type="hidden" name="id" value="'.$container->id.'">'
+                .'<button type="submit" class="btn btn-xs btn-danger">Delete</button>'
+                .'</form>';
+        }
+
+        return [
             'created_at' => $date,
             'code' => $container->code ?? '-',
             'do_code' => $container->do_code,
@@ -49,7 +68,8 @@ class ContainerTransformer extends TransformerAbstract
             'is_storage_monitor_start' => $container->is_storage_monitor_start,
             'is_storage_monitor_end' => $container->is_storage_monitor_end,
             'is_demurrage_monitor_start' => $container->is_demurrage_monitor_start,
-            'is_demurrage_monitor_end' => $container->is_demurrage_monitor_end
+            'is_demurrage_monitor_end' => $container->is_demurrage_monitor_end,
+            'action' => $action,
         ];
     }
 }

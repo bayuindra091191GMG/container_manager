@@ -353,8 +353,8 @@ class ShippingInstructionController extends Controller
                         $errors[] = 'Warehouse Transfer '.$tmpDo->code.' must select delivery type!';
                     }
 
-                    if (empty($detail['trucking_1']) || empty($detail['trucking_2'])) {
-                        $errors[] = 'Warehouse Transfer '.$tmpDo->code.' must input consignee for each container!';
+                    if (empty($detail['trucking'])) {
+                        $errors[] = 'Warehouse Transfer '.$tmpDo->code.' must input consignee for the container!';
                     }
                 }
             }
@@ -427,8 +427,6 @@ class ShippingInstructionController extends Controller
                         $newSiDetail->transportation = $doHeader->transportation;
                         $newSiDetail->container1_id = $doHeader->container1_id;
                         $newSiDetail->container1_code = $doHeader->container1_code;
-                        $newSiDetail->container2_id = $doHeader->container2_id;
-                        $newSiDetail->container2_code = $doHeader->container2_code;
 
                         $realQty = $doDetail->qty;
                         if (! empty($detail['real_qty']) && $doHeader->type == 'transfer') {
@@ -450,18 +448,9 @@ class ShippingInstructionController extends Controller
                         $doHeader->closed_by_si_id = $newSiHeader->id;
                         $doHeader->save();
 
-                        $divider = 1;
-                        if (! empty($doHeader->container1_code) && ! empty($doHeader->container2_code)) {
-                            $divider = 2;
-                        }
-
-                        // Create monitors
+                        // Create one monitor for the DO container
                         if (! empty($doHeader->container1_code)) {
-                            $this->storeMonitor($newSiDetail, $doHeader->container1_code, $divider);
-                        }
-
-                        if (! empty($doHeader->container2_code)) {
-                            $this->storeMonitor($newSiDetail, $doHeader->container2_code, $divider);
+                            $this->storeMonitor($newSiDetail, $doHeader->container1_code);
                         }
                     }
                 }
@@ -476,48 +465,19 @@ class ShippingInstructionController extends Controller
                         $newSiDetail->header_code = $newSiHeader->code;
                         $newSiDetail->delivery_type = $detail['delivery_type'];
 
-                        $trucking1 = null;
-                        $consigneeCode1 = null;
-                        if (! empty($detail['trucking_1'])) {
-                            $consigneeId = intval($detail['trucking_1']);
+                        $trucking = null;
+                        $consigneeCode = null;
+                        if (! empty($detail['trucking'])) {
+                            $consigneeId = intval($detail['trucking']);
                             $newSiDetail->consignee_id = $consigneeId;
 
                             $consignee = DB::table('consignees')->where('id', '=', $consigneeId)->first();
-                            $trucking1 = strtoupper($consignee->name);
-                            $consigneeCode1 = strtoupper($consignee->code);
+                            $trucking = strtoupper($consignee->name);
+                            $consigneeCode = strtoupper($consignee->code);
                         }
 
-                        $trucking2 = null;
-                        $consigneeCode2 = null;
-                        if (! empty($detail['trucking_2'])) {
-                            $consigneeId = intval($detail['trucking_2']);
-                            $newSiDetail->consignee_id = $consigneeId;
-
-                            $consignee = DB::table('consignees')->where('id', '=', $consigneeId)->first();
-                            $trucking2 = strtoupper($consignee->name);
-                            $consigneeCode2 = strtoupper($consignee->code);
-                        }
-
-                        $truckingInput = '';
-                        $consigneeCodeInput = '';
-                        if (! empty($trucking1) && ! empty($trucking2)) {
-                            if ($trucking1 !== $trucking2) {
-                                $truckingInput = $trucking1.', '.$trucking2;
-                                $consigneeCodeInput = $consigneeCode1.', '.$consigneeCode2;
-                            } else {
-                                $truckingInput = $trucking1;
-                                $consigneeCodeInput = $consigneeCode1;
-                            }
-                        } elseif (! empty($trucking1) && empty($trucking2)) {
-                            $truckingInput = $trucking1;
-                            $consigneeCodeInput = $consigneeCode1;
-                        } elseif (empty($trucking1) && ! empty($trucking2)) {
-                            $truckingInput = $trucking2;
-                            $consigneeCodeInput = $consigneeCode2;
-                        }
-
-                        $newSiDetail->trucking = $truckingInput;
-                        $newSiDetail->consignee_code = $consigneeCodeInput;
+                        $newSiDetail->trucking = $trucking;
+                        $newSiDetail->consignee_code = $consigneeCode;
 
                         $doHeader = DoHeader::where('id', '=', $detail['do_id'])
                             ->first();
@@ -541,12 +501,11 @@ class ShippingInstructionController extends Controller
                         $newSiDetail->transportation = $doHeader->transportation;
                         $newSiDetail->container1_id = $doHeader->container1_id;
                         $newSiDetail->container1_code = $doHeader->container1_code;
-                        $newSiDetail->container2_id = $doHeader->container2_id;
-                        $newSiDetail->container2_code = $doHeader->container2_code;
 
-                        $realQty1 = MiscUtility::toFloat($detail['real_qty_1']);
-                        $realQty2 = MiscUtility::toFloat($detail['real_qty_1']);
-                        $newSiDetail->real_qty = $realQty1 + $realQty2;
+                        $realQty = ! empty($detail['real_qty'])
+                            ? MiscUtility::toFloat($detail['real_qty'])
+                            : $doDetail->qty;
+                        $newSiDetail->real_qty = $realQty;
 
                         $newSiDetail->created_by = Auth::id();
                         $newSiDetail->updated_by = Auth::id();
@@ -557,18 +516,15 @@ class ShippingInstructionController extends Controller
                         $doHeader->closed_by_si_id = $newSiHeader->id;
                         $doHeader->save();
 
-                        $divider = 1;
-                        if (! empty($doHeader->container1_code) && ! empty($doHeader->container2_code)) {
-                            $divider = 2;
-                        }
-
-                        // Create monitors
+                        // Create one monitor for the DO container
                         if (! empty($doHeader->container1_code)) {
-                            $this->storeMonitorWt($newSiDetail, $doHeader->container1_code, $realQty1, $detail['trucking_1'], $detail['remark_1']);
-                        }
-
-                        if (! empty($doHeader->container2_code)) {
-                            $this->storeMonitorWt($newSiDetail, $doHeader->container2_code, $realQty2, $detail['trucking_2'], $detail['remark_2']);
+                            $this->storeMonitorWt(
+                                $newSiDetail,
+                                $doHeader->container1_code,
+                                $realQty,
+                                $detail['trucking'],
+                                $detail['remark'] ?? null
+                            );
                         }
                     }
                 }
@@ -591,7 +547,7 @@ class ShippingInstructionController extends Controller
         }
     }
 
-    public function storeMonitor(ShippingInstructionDetail $siDetail, $containerCode, $divider)
+    public function storeMonitor(ShippingInstructionDetail $siDetail, $containerCode)
     {
         $newMonitor = new ShippingInstructionMonitor;
         $newMonitor->header_id = $siDetail->header_id;
@@ -616,8 +572,8 @@ class ShippingInstructionController extends Controller
         $newMonitor->item_id = $siDetail->item_id;
         $newMonitor->item_code = $siDetail->item_code;
         $newMonitor->item_name = $siDetail->item_name;
-        $newMonitor->qty = $siDetail->qty / $divider;
-        $newMonitor->real_qty = $siDetail->real_qty / $divider;
+        $newMonitor->qty = $siDetail->qty;
+        $newMonitor->real_qty = $siDetail->real_qty;
         $newMonitor->unit = $siDetail->unit;
 
         $container = DB::table('container_datas')
@@ -766,7 +722,6 @@ class ShippingInstructionController extends Controller
                 'so_no' => $detail->so_code,
                 'shipto_name' => $detail->shipto_name,
                 'container1' => $detail->container1_code ?? '',
-                'container2' => $detail->container2_code ?? '',
                 'consignee_select_url' => route('consignee.select2', ['branch_id' => $siHeader->destination_branch_id]),
                 'do_select_url' => route('delivery_order.select2', ['branch_id' => $siHeader->destination_branch_id, 'is_edit' => 1, 'si_id' => $siHeader->id]),
                 'is_initiated' => false,
@@ -786,32 +741,22 @@ class ShippingInstructionController extends Controller
                     ->where('container_code', '=', $detail->container1_code)
                     ->first();
 
-                $monitor2 = DB::table('shipping_instruction_monitors')
-                    ->where('header_id', '=', $siHeader->id)
-                    ->where('container_code', '=', $detail->container2_code)
-                    ->first();
-
                 $detailListWtArr[] = [
                     'key_id' => MiscUtility::generateRandomShortString(9),
                     'id' => $detail->id,
                     'do_id' => $detail->do_id,
                     'do_code' => $detail->do_code,
                     'delivery_type' => $detail->delivery_type,
-                    'trucking_1' => $monitor1->consignee_id,
-                    'consignee_name_1' => $monitor1->trucking,
-                    'trucking_2' => $monitor2->consignee_id,
-                    'consignee_name_2' => $monitor2->trucking,
+                    'trucking' => $monitor1?->consignee_id,
+                    'consignee_name' => $monitor1?->trucking,
                     'so_code' => $detail->so_code,
                     'shipto_name' => $detail->shipto_name,
                     'container1' => $detail->container1_code ?? '',
-                    'container2' => $detail->container2_code ?? '',
                     'consignee_select_url' => route('consignee.select2', ['branch_id' => $siHeader->destination_branch_id]),
                     'item' => $detail->item_code,
                     'unit' => $detail->unit,
-                    'real_qty_1' => $monitor1->real_qty,
-                    'real_qty_2' => $monitor2->real_qty,
-                    'remark_1' => $monitor1->remark,
-                    'remark_2' => $monitor2->remark,
+                    'real_qty' => $monitor1?->real_qty,
+                    'remark' => $monitor1?->remark,
                 ];
             }
         }
@@ -941,8 +886,8 @@ class ShippingInstructionController extends Controller
                         $errors[] = 'Warehouse Transfer '.$tmpDo->code.' must select delivery type!';
                     }
 
-                    if (empty($detail['trucking_1']) || empty($detail['trucking_2'])) {
-                        $errors[] = 'Warehouse Transfer '.$tmpDo->code.' must input consignee for each container!';
+                    if (empty($detail['trucking'])) {
+                        $errors[] = 'Warehouse Transfer '.$tmpDo->code.' must input consignee for the container!';
                     }
                 }
             }
@@ -1035,8 +980,6 @@ class ShippingInstructionController extends Controller
                         $siDetail->transportation = $doHeader->transportation;
                         $siDetail->container1_id = $doHeader->container1_id;
                         $siDetail->container1_code = $doHeader->container1_code;
-                        $siDetail->container2_id = $doHeader->container2_id;
-                        $siDetail->container2_code = $doHeader->container2_code;
 
                         $realQty = $doDetail->qty;
                         if (! empty($detail['real_qty']) && $doHeader->type == 'transfer') {
@@ -1095,8 +1038,6 @@ class ShippingInstructionController extends Controller
                             $newSiDetail->transportation = $doHeader->transportation;
                             $newSiDetail->container1_id = $doHeader->container1_id;
                             $newSiDetail->container1_code = $doHeader->container1_code;
-                            $newSiDetail->container2_id = $doHeader->container2_id;
-                            $newSiDetail->container2_code = $doHeader->container2_code;
 
                             $realQty = $doDetail->qty;
                             if (! empty($detail['real_qty']) && $doHeader->type == 'transfer') {
@@ -1141,17 +1082,8 @@ class ShippingInstructionController extends Controller
                     $tmpSiDetailsWt[] = $updatedSiDetail;
                 }
 
-                $divider = 1;
-                if (! empty($doHeader->container1_code) && ! empty($doHeader->container2_code)) {
-                    $divider = 2;
-                }
-
                 if (! empty($doHeader->container1_code)) {
-                    $this->storeMonitor($tmpSiDetail, $doHeader->container1_code, $divider);
-                }
-
-                if (! empty($doHeader->container2_code)) {
-                    $this->storeMonitor($tmpSiDetail, $doHeader->container2_code, $divider);
+                    $this->storeMonitor($tmpSiDetail, $doHeader->container1_code);
                 }
             }
 
@@ -1173,48 +1105,19 @@ class ShippingInstructionController extends Controller
                         $newSiDetail->header_code = $siHeader->code;
                         $newSiDetail->delivery_type = $detail['delivery_type'];
 
-                        $trucking1 = null;
-                        $consigneeCode1 = null;
-                        if (! empty($detail['trucking_1'])) {
-                            $consigneeId = intval($detail['trucking_1']);
+                        $trucking = null;
+                        $consigneeCode = null;
+                        if (! empty($detail['trucking'])) {
+                            $consigneeId = intval($detail['trucking']);
                             $newSiDetail->consignee_id = $consigneeId;
 
                             $consignee = DB::table('consignees')->where('id', '=', $consigneeId)->first();
-                            $trucking1 = strtoupper($consignee->name);
-                            $consigneeCode1 = strtoupper($consignee->code);
+                            $trucking = strtoupper($consignee->name);
+                            $consigneeCode = strtoupper($consignee->code);
                         }
 
-                        $trucking2 = null;
-                        $consigneeCode2 = null;
-                        if (! empty($detail['trucking_2'])) {
-                            $consigneeId = intval($detail['trucking_2']);
-                            $newSiDetail->consignee_id = $consigneeId;
-
-                            $consignee = DB::table('consignees')->where('id', '=', $consigneeId)->first();
-                            $trucking2 = strtoupper($consignee->name);
-                            $consigneeCode2 = strtoupper($consignee->code);
-                        }
-
-                        $truckingInput = '';
-                        $consigneeCodeInput = '';
-                        if (! empty($trucking1) && ! empty($trucking2)) {
-                            if ($trucking1 !== $trucking2) {
-                                $truckingInput = $trucking1.', '.$trucking2;
-                                $consigneeCodeInput = $consigneeCode1.', '.$consigneeCode2;
-                            } else {
-                                $truckingInput = $trucking1;
-                                $consigneeCodeInput = $consigneeCode1;
-                            }
-                        } elseif (! empty($trucking1) && empty($trucking2)) {
-                            $truckingInput = $trucking1;
-                            $consigneeCodeInput = $consigneeCode1;
-                        } elseif (empty($trucking1) && ! empty($trucking2)) {
-                            $truckingInput = $trucking2;
-                            $consigneeCodeInput = $consigneeCode2;
-                        }
-
-                        $newSiDetail->trucking = $truckingInput;
-                        $newSiDetail->consignee_code = $consigneeCodeInput;
+                        $newSiDetail->trucking = $trucking;
+                        $newSiDetail->consignee_code = $consigneeCode;
 
                         $doHeader = DoHeader::where('id', '=', $detail['do_id'])
                             ->first();
@@ -1238,12 +1141,11 @@ class ShippingInstructionController extends Controller
                         $newSiDetail->transportation = $doHeader->transportation;
                         $newSiDetail->container1_id = $doHeader->container1_id;
                         $newSiDetail->container1_code = $doHeader->container1_code;
-                        $newSiDetail->container2_id = $doHeader->container2_id;
-                        $newSiDetail->container2_code = $doHeader->container2_code;
 
-                        $realQty1 = MiscUtility::toFloat($detail['real_qty_1']);
-                        $realQty2 = MiscUtility::toFloat($detail['real_qty_1']);
-                        $newSiDetail->real_qty = $realQty1 + $realQty2;
+                        $realQty = ! empty($detail['real_qty'])
+                            ? MiscUtility::toFloat($detail['real_qty'])
+                            : $doDetail->qty;
+                        $newSiDetail->real_qty = $realQty;
 
                         $newSiDetail->created_by = Auth::id();
                         $newSiDetail->updated_by = Auth::id();
@@ -1254,13 +1156,15 @@ class ShippingInstructionController extends Controller
                         $doHeader->closed_by_si_id = $siHeader->id;
                         $doHeader->save();
 
-                        // Create monitors
+                        // Create one monitor for the DO container
                         if (! empty($doHeader->container1_code)) {
-                            $this->storeMonitorWt($newSiDetail, $doHeader->container1_code, $realQty1, $detail['trucking_1'], $detail['remark_1']);
-                        }
-
-                        if (! empty($doHeader->container2_code)) {
-                            $this->storeMonitorWt($newSiDetail, $doHeader->container2_code, $realQty2, $detail['trucking_2'], $detail['remark_2']);
+                            $this->storeMonitorWt(
+                                $newSiDetail,
+                                $doHeader->container1_code,
+                                $realQty,
+                                $detail['trucking'],
+                                $detail['remark'] ?? null
+                            );
                         }
                     }
                 }
@@ -1325,7 +1229,6 @@ class ShippingInstructionController extends Controller
                 'so_code' => $detail->so_code,
                 'shipto_name' => $detail->shipto_name,
                 'container1' => $detail->container1_code ?? '',
-                'container2' => $detail->container2_code ?? '',
                 'item' => $detail->item_code,
                 'unit' => $detail->unit,
                 'qty' => $detail->real_qty,
@@ -1341,28 +1244,19 @@ class ShippingInstructionController extends Controller
                     ->where('container_code', '=', $detail->container1_code)
                     ->first();
 
-                $monitor2 = DB::table('shipping_instruction_monitors')
-                    ->where('header_id', '=', $siHeader->id)
-                    ->where('container_code', '=', $detail->container2_code)
-                    ->first();
-
                 $detailListWtArr[] = [
                     'id' => $detail->id,
                     'do_id' => $detail->do_id,
                     'do_code' => $detail->do_code,
                     'delivery_type' => $detail->delivery_type,
-                    'trucking_1' => $monitor1->trucking,
-                    'trucking_2' => $monitor2->trucking,
+                    'trucking' => $monitor1?->trucking,
                     'so_code' => $detail->so_code,
                     'shipto_name' => $detail->shipto_name,
                     'container1' => $detail->container1_code ?? '',
-                    'container2' => $detail->container2_code ?? '',
                     'item' => $detail->item_code,
                     'unit' => $detail->unit,
-                    'real_qty_1' => $monitor1->real_qty,
-                    'real_qty_2' => $monitor2->real_qty,
-                    'remark_1' => $monitor1->remark,
-                    'remark_2' => $monitor2->remark,
+                    'real_qty' => $monitor1?->real_qty,
+                    'remark' => $monitor1?->remark,
                 ];
             }
         }
@@ -2159,13 +2053,6 @@ class ShippingInstructionController extends Controller
                 DB::table('shipping_instruction_monitors')
                     ->where('header_id', '=', $siId)
                     ->where('container_code', '=', $doHeader->container1_code)
-                    ->delete();
-            }
-
-            if (! empty($doHeader->container2_code)) {
-                DB::table('shipping_instruction_monitors')
-                    ->where('header_id', '=', $siId)
-                    ->where('container_code', '=', $doHeader->container2_code)
                     ->delete();
             }
 

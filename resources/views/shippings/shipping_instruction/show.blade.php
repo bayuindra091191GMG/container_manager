@@ -265,8 +265,7 @@
                                                             <th>CONSIGNEE</th>
                                                             <th>SO NO</th>
                                                             <th>SHIP NAME</th>
-                                                            <th>CONTAINER1</th>
-                                                            <th>CONTAINER2</th>
+                                                            <th>CONTAINER</th>
                                                             <th>ITEM</th>
                                                             <th>UNIT</th>
                                                             <th>QTY</th>
@@ -298,9 +297,6 @@
                                                                 <span>@{{ detail.container1 }}</span>
                                                             </td>
                                                             <td>
-                                                                <span>@{{ detail.container2 }}</span>
-                                                            </td>
-                                                            <td>
                                                                 <span>@{{ detail.item }}</span>
                                                             </td>
                                                             <td class="text-center">
@@ -308,6 +304,9 @@
                                                             </td>
                                                             <td class="text-end">
                                                                 <span>@{{ detail.qty }}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>@{{ detail.real_qty }}</span>
                                                             </td>
                                                             <td>
                                                                 <span>@{{ detail.remark }}</span>
@@ -369,7 +368,7 @@
                                                                     <tbody>
                                                                         <tr>
                                                                             <td>
-                                                                                <span>@{{ detail.trucking_1 }}</span>
+                                                                                <span>@{{ detail.trucking }}</span>
                                                                             </td>
                                                                             <td>
                                                                                 <span>@{{ detail.so_no }}</span>
@@ -381,37 +380,13 @@
                                                                                 <span>@{{ detail.container1 }}</span>
                                                                             </td>
                                                                             <td>
-                                                                                <span>@{{ detail.real_qty_1 }}</span>
+                                                                                <span>@{{ detail.real_qty }}</span>
                                                                             </td>
                                                                             <td>
                                                                                 <span>@{{ detail.unit }}</span>
                                                                             </td>
                                                                             <td>
-                                                                                <span>@{{ detail.remark_1 }}</span>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>
-                                                                                <span>@{{ detail.trucking_2 }}</span>
-                                                                            </td>
-                                                                            <td>
-                                                                                <span>@{{ detail.so_no }}</span>
-                                                                            </td>
-                                                                            <td>
-                                                                                <span>@{{ detail.shipto_name }}</span>
-                                                                            </td>
-                                                                            <td>
-                                                                                <span>@{{ detail.container2 }}</span>
-                                                                            </td>
-                                                                            <td>
-                                                                                <span>@{{ detail.real_qty_2 }}</span>
-                                                                            </td>
-                                                                            <td>
-                                                                                <span>@{{ detail.unit }}</span>
-                                                                            </td>
-                                                                            <td>
-                                                                                <span>@{{ detail.remark_2 }}</span>
-                                                                            </td>
+                                                                                <span>@{{ detail.remark }}</span>
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
