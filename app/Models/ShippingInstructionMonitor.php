@@ -1,0 +1,124 @@
+<?php
+
+/**
+ * Created by Reliese Model.
+ */
+
+namespace App\Models;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Class ShippingInstructionMonitor
+ *
+ * @property int $id
+ * @property int|null $branch_id
+ * @property int|null $header_id
+ * @property string|null $header_code
+ * @property int|null $consignee_id
+ * @property string|null $consignee_code
+ * @property string|null $trucking
+ * @property string|null $delivery_type
+ * @property int|null $do_id
+ * @property string|null $do_code
+ * @property Carbon|null $do_date
+ * @property string|null $do_type
+ * @property string|null $so_code
+ * @property string|null $dr_code
+ * @property string|null $shipto_code
+ * @property string|null $shipto_name
+ * @property int|null $item_id
+ * @property string|null $item_code
+ * @property string|null $item_name
+ * @property float|null $qty
+ * @property float|null $real_qty
+ * @property string|null $unit
+ * @property int|null $container_id
+ * @property string|null $container_code
+ * @property string|null $transportation
+ * @property int|null $status_id
+ * @property Carbon|null $status_updated_at
+ * @property Carbon|null $created_at
+ * @property int|null $created_by
+ * @property Carbon|null $updated_at
+ * @property int|null $updated_by
+ * @property bool|null $is_sync
+ * @property Carbon|null $dooring_at
+ * @property Carbon|null $received_at
+ * @property Carbon|null $berthing_at
+ * @property string|null $remark
+ *
+ * @property ShippingInstructionHeader|null $shipping_instruction_header
+ * @property Status|null $status
+ *
+ * @package App\Models
+ */
+class ShippingInstructionMonitor extends Model
+{
+	protected $table = 'shipping_instruction_monitors';
+
+	protected $casts = [
+		'branch_id' => 'int',
+		'header_id' => 'int',
+		'consignee_id' => 'int',
+		'do_id' => 'int',
+		'do_date' => 'datetime',
+		'item_id' => 'int',
+		'qty' => 'float',
+		'real_qty' => 'float',
+		'container_id' => 'int',
+		'status_id' => 'int',
+		'status_updated_at' => 'datetime',
+		'created_by' => 'int',
+		'updated_by' => 'int',
+        'is_sync' => 'bool',
+        'berthing_at' => 'datetime'
+	];
+
+	protected $fillable = [
+		'branch_id',
+		'header_id',
+		'header_code',
+		'consignee_id',
+		'consignee_code',
+		'trucking',
+		'delivery_type',
+		'do_id',
+		'do_code',
+        'do_date',
+        'do_type',
+        'so_code',
+		'dr_code',
+		'shipto_code',
+		'shipto_name',
+		'item_id',
+		'item_code',
+		'item_name',
+		'qty',
+        'real_qty',
+		'unit',
+		'container_id',
+		'container_code',
+        'transportation',
+		'status_id',
+		'status_updated_at',
+		'created_by',
+		'updated_by',
+        'is_sync',
+        'dooring_at',
+        'received_at',
+        'berthing_at',
+        'remark'
+	];
+
+	public function shipping_instruction_header()
+	{
+		return $this->belongsTo(ShippingInstructionHeader::class, 'header_id');
+	}
+
+	public function status()
+	{
+		return $this->belongsTo(Status::class);
+	}
+}

@@ -1,0 +1,191 @@
+@font-face {
+    font-family: Arsenal;
+    src: url('/fonts/arsenal_regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: Arsenal;
+    src: url('/fonts/arsenal_italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: Arsenal;
+    src: url('/fonts/arsenal_bold.ttf') format('truetype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: Arsenal;
+    src: url('/fonts/arsenal_bolditalic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+/*body {*/
+/*    font-family: 'Lucida Sans', sans-serif !important;*/
+/*}*/
+
+/*.font-arsenal{*/
+/*    font-family: Arsenal;*/
+/*}*/
+
+
+
+.dropdown-wrapper {
+    display: none !important;
+}
+
+.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li .sidebar-link::after {
+    background-color: #C5003E !important;
+}
+
+.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li .sidebar-link.active {
+    background-color: #f7edf1 !important;
+}
+
+.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-wrapper, .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-icon-wrapper {
+    padding: 22px 15px !important;
+}
+
+.select2-container .select2-selection--single {
+    height: 38px !important;
+    padding: 5px !important;
+    border-color: #ced4da !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px !important;
+}
+
+.ck-editor__editable_inline {
+    min-height: 300px;
+}
+
+.page-wrapper .page-header .header-wrapper .nav-right .profile-dropdown {
+    width: 220px !important;
+    right: 0 !important;
+    left: auto !important;
+}
+
+.page-wrapper.compact-wrapper .page-header.close_icon {
+    margin-left: 65px;
+    width: calc(100% - 65px);
+}
+
+.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper.close_icon ~ .page-body, .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper.close_icon ~ footer {
+    margin-left: 65px;
+    transition: 0.5s;
+}
+
+
+
+.product-list-container {
+    flex: 0 0 auto;
+    width: 65%;
+}
+
+.checkout-container {
+    flex: 0 0 auto;
+    width: 35%;
+}
+
+.product-container {
+    flex: 0 0 auto;
+    width: 33.33333333%;
+}
+
+.product-name {
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+}
+
+.product-price {
+    font-size: 1.2rem;
+    color: black;
+}
+
+.add-product-btn {
+    flex: 0 0 auto;
+    width: auto;
+    padding-left: 0;
+}
+
+@media only screen and (max-width: 1500px) {
+    .product-price {
+        font-size: 1rem;
+        color: black;
+    }
+
+    .product-container {
+        flex: 0 0 auto;
+        width: 50%;
+    }
+
+    .add-product-btn {
+        flex: 0 0 auto;
+        width: 100%;
+        padding-left: calc(var(--bs-gutter-x) * 0.5);
+        margin-top: 10px;
+    }
+
+    .product-list-container {
+        flex: 0 0 auto;
+        width: 55%;
+    }
+
+    .checkout-container {
+        flex: 0 0 auto;
+        width: 45%;
+    }
+}
+
+
+
+
+
+.patient-container {
+    max-height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.patient-item {
+    margin: 5px 10px;
+    border: 1px solid #dbdbdb;
+    padding: 10px 15px;
+    background-color: white;
+}
+
+.patient-item:hover {
+    background-color: #dbdbdb;
+}
+
+.page-circle {
+    border-radius: 100px;
+    border: 3px solid #808080;
+    padding: 13px 17px;
+    color: #808080;
+    background-color: white;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.page-circle p {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
+}
+
+.page-circle.selected {
+    border: 3px solid #C5003E;
+    color: #C5003E;
+}
+
+.page-line {
+    border: 3px solid #C5003E;
+    position: absolute;
+    left: 20px;
+    right: 20px;
+}
