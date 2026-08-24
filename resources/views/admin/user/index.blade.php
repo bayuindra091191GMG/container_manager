@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Users')
@@ -132,7 +131,7 @@
                 { data: 'username', name: 'users.username', class: 'text-center'},
                 { data: 'branch', name: 'branches.name', class: 'text-center'},
                 { data: 'email', name: 'users.email', class: 'text-center'},
-                { data: 'level', name: 'hierarchies.name', class: 'text-center'},
+                { data: 'level', name: 'roles.name', class: 'text-center'},
                 { data: 'status', name: 'statuses.display', class: 'text-center'},
                 { data: 'created_at', name: 'users.created_at', class: 'text-center', orderable: true, searchable: false,
                     render: function ( data, type, row ){

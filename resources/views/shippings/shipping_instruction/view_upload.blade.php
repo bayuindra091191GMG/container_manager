@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Division')
@@ -36,8 +35,8 @@
             <div class="card-body">
                 <div class="row mb-3 justify-content-end">
                     <div class="col-auto">
-                        @if (auth()->user()->hierarchy->hasPermissionTo('si.document-upload') ||
-                                auth()->user()->is_superadmin)
+                        @if (auth()->user()->can('si.document-upload') ||
+                                auth()->user()->isSuperAdmin())
                             <a class="btn btn-sm btn-success" href="{{ route('shipping_instruction.upload.form', ['id' => $siHeader->id]) }}"><i class="fa fa-fw fa-plus"></i></a>
                         @endif
 
@@ -72,8 +71,8 @@
                                         @foreach ($uploads as $upload)
                                         <tr>
                                             <td class="text-center">
-                                                @if (auth()->user()->hierarchy->hasPermissionTo('si.document-delete') ||
-                                                    auth()->user()->is_superadmin)
+                                                @if (auth()->user()->can('si.document-delete') ||
+                                                    auth()->user()->isSuperAdmin())
                                                     <button type="button" class="btn btn-sm btn-danger" onclick="popModalDelete({{ $upload->id }})">
                                                         <i class="fa fa-fw fa-trash"></i>&nbsp;Delete
                                                     </button>
@@ -83,8 +82,8 @@
                                                 <span>{{ $upload->filename }}</span>
                                             </td>
                                             <td class="text-center">
-                                                @if (auth()->user()->hierarchy->hasPermissionTo('si.document-download') ||
-                                                    auth()->user()->is_superadmin)
+                                                @if (auth()->user()->can('si.document-download') ||
+                                                    auth()->user()->isSuperAdmin())
                                                     <a class="btn btn-sm btn-success" href="{{ route('shipping_instruction.document.download', ['id' => $upload->id]) }}">
                                                         <i class="fa fa-fw fa-download"></i>&nbsp;Download
                                                     </a>

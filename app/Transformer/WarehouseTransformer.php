@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Transformer;
 
 use Carbon\Carbon;
@@ -9,27 +8,28 @@ use League\Fractal\TransformerAbstract;
 
 class WarehouseTransformer extends TransformerAbstract
 {
-    public function transform($warehouse){
+    public function transform($warehouse)
+    {
         $date = Carbon::parse($warehouse->created_at)->toIso8601String();
-        $action = "";
+        $action = '';
 
-        if($warehouse->status_id != 2){
-            if(Auth::user()->is_superadmin || Auth::user()->hierarchy->hasPermissionTo('warehouse.show')){
-                $action .= '<a class="btn btn-xs btn-info" href="'. route('warehouse.show', $warehouse->id) .'"><i class="fa fa-fw fa-eye"></i></a>';
+        if ($warehouse->status_id != 2) {
+            if (Auth::user()->isSuperAdmin() || Auth::user()->can('warehouse.show')) {
+                $action .= '<a class="btn btn-xs btn-info" href="'.route('warehouse.show', $warehouse->id).'"><i class="fa fa-fw fa-eye"></i></a>';
             }
 
-            if(Auth::user()->is_superadmin || Auth::user()->hierarchy->hasPermissionTo('warehouse.edit')){
-                $action .= '&nbsp;<a class="btn btn-xs btn-secondary" href="'. route('warehouse.edit', $warehouse->id) .'"><i class="fa fa-fw fa-edit"></i></a>';
+            if (Auth::user()->isSuperAdmin() || Auth::user()->can('warehouse.edit')) {
+                $action .= '&nbsp;<a class="btn btn-xs btn-secondary" href="'.route('warehouse.edit', $warehouse->id).'"><i class="fa fa-fw fa-edit"></i></a>';
             }
         }
 
-        return[
-            'created_at'    => $date,
-            'name'          => $warehouse->name ?? '-',
-            'code'          => $warehouse->code,
-            'branch'        => $warehouse->branch->name,
-            'description'   => $warehouse->description ?? '-',
-            'action'        => $action
+        return [
+            'created_at' => $date,
+            'name' => $warehouse->name ?? '-',
+            'code' => $warehouse->code,
+            'branch' => $warehouse->branch->name,
+            'description' => $warehouse->description ?? '-',
+            'action' => $action,
         ];
     }
 }

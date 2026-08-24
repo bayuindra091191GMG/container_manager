@@ -52,7 +52,7 @@ class DeliveryOrderController extends Controller
         }
 
         $admin = Auth::user();
-        if ($admin->is_superadmin == 1) {
+        if ($admin->isSuperAdmin()) {
             $branches = DB::table('branches')
                 ->orderBy('name')
                 ->get();
@@ -211,7 +211,7 @@ class DeliveryOrderController extends Controller
             foreach ($request->input('details') as $detail) {
                 $item = Item::find(intval($detail['item_id']));
 
-                $newDoDetail = new DoDetail();
+                $newDoDetail = new DoDetail;
                 $newDoDetail->header_id = $doHeader->id;
                 $newDoDetail->transfer_no = $doHeader->code;
                 $newDoDetail->item_id = $item->id;
@@ -325,7 +325,7 @@ class DeliveryOrderController extends Controller
 
             DB::beginTransaction();
 
-            $newDoHeader = new DoHeader();
+            $newDoHeader = new DoHeader;
             $newDoHeader->code = strtoupper(trim($request->input('code')));
             $newDoHeader->type = $request->input('type');
             $newDoHeader->date = Carbon::createFromFormat('!d-m-Y', $request->input('date'), 'Asia/Jakarta')->toDateTimeString();
@@ -350,7 +350,7 @@ class DeliveryOrderController extends Controller
             foreach ($request->input('details') as $detail) {
                 $item = Item::find(intval($detail['item_id']));
 
-                $newDoDetail = new DoDetail();
+                $newDoDetail = new DoDetail;
                 $newDoDetail->header_id = $newDoHeader->id;
                 $newDoDetail->transfer_no = $newDoHeader->code;
                 $newDoDetail->item_id = $item->id;
@@ -445,7 +445,7 @@ class DeliveryOrderController extends Controller
             return;
         }
 
-        $newContainer = new ContainerData();
+        $newContainer = new ContainerData;
         $newContainer->code = $containerCode;
         $newContainer->do_id = $doHeader->id;
         $newContainer->do_code = $doHeader->code;
@@ -555,7 +555,7 @@ class DeliveryOrderController extends Controller
             ->select('do_headers.*', 'branches.name as branch_name')
             ->where('do_headers.status_id', '!=', 21);
 
-        if ($admin->is_superadmin != 1) {
+        if (! $admin->isSuperAdmin()) {
             $branchIdArr[] = $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
                 $branchIdArr[] = $adminBranch->id;

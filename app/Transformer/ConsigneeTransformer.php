@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Transformer;
 
 use Carbon\Carbon;
@@ -9,22 +8,23 @@ use League\Fractal\TransformerAbstract;
 
 class ConsigneeTransformer extends TransformerAbstract
 {
-    public function transform($consignee){
+    public function transform($consignee)
+    {
         $date = Carbon::parse($consignee->created_at)->toIso8601String();
         // $user = Auth::user();
-        $action = "";
+        $action = '';
 
-        if($consignee->status_id != 2){
-            if(Auth::user()->is_superadmin || Auth::user()->hierarchy->hasPermissionTo('consignee.show')){
-                $action .= '<a class="btn btn-xs btn-info" href="'. route('consignee.show', $consignee->id) .'"><i class="fa fa-fw fa-eye"></i></a>';
+        if ($consignee->status_id != 2) {
+            if (Auth::user()->isSuperAdmin() || Auth::user()->can('consignee.show')) {
+                $action .= '<a class="btn btn-xs btn-info" href="'.route('consignee.show', $consignee->id).'"><i class="fa fa-fw fa-eye"></i></a>';
             }
 
-            if(Auth::user()->is_superadmin || Auth::user()->hierarchy->hasPermissionTo('consignee.edit')){
-                $action .= '&nbsp;<a class="btn btn-xs btn-secondary" href="'. route('consignee.edit', $consignee->id) .'"><i class="fa fa-fw fa-edit"></i></a>';
+            if (Auth::user()->isSuperAdmin() || Auth::user()->can('consignee.edit')) {
+                $action .= '&nbsp;<a class="btn btn-xs btn-secondary" href="'.route('consignee.edit', $consignee->id).'"><i class="fa fa-fw fa-edit"></i></a>';
             }
         }
 
-        return[
+        return [
             'created_at' => $date,
             'name' => $consignee->name ?? '-',
             'code' => $consignee->code,
@@ -33,7 +33,7 @@ class ConsigneeTransformer extends TransformerAbstract
             // 'province_name' => $consignee->province_name ?? "-",
             'branch_name' => $consignee->branch_name,
             // 'description'   => $consignee->description ?? '-',
-            'action' => $action
+            'action' => $action,
         ];
     }
 }

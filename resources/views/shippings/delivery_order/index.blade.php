@@ -40,7 +40,7 @@
             <div class="card-body">
                 <div class="row mb-3 justify-content-end">
                     <div class="col-auto">
-                        @if(auth()->user()->is_superadmin || auth()->user()->hierarchy->hasPermissionTo('do.add'))
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->can('do.add'))
                             <a class="btn btn-sm btn-primary" href="{{ route('delivery_order.create') }}"><i class="fa fa-fw fa-plus"></i>&nbsp;Create</a>
                         @endif
                     </div>

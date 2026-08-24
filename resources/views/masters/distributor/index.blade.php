@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Distributor')
@@ -41,7 +40,7 @@
             <div class="card-body">
                 <div class="row mb-3 justify-content-end">
                     <div class="col-auto">
-                        @if(auth()->user()->is_superadmin || auth()->user()->hierarchy->hasPermissionTo('distributor.add'))
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->can('distributor.add'))
                             <a class="btn btn-primary btn-sm " href="{{ route('distributor.create') }}"><i class="fa fa-fw fa-plus"></i></a>
                         @endif
                     </div>

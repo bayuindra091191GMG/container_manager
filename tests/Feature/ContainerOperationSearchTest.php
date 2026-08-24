@@ -82,12 +82,12 @@ class ContainerOperationSearchTest extends TestCase
             ],
         ]);
 
-        $user = new User();
+        $user = new User;
         $user->forceFill([
             'id' => 1,
-            'is_superadmin' => 1,
         ]);
         $user->exists = true;
+        $this->createSuperAdminRole();
         $this->actingAs($user);
     }
 

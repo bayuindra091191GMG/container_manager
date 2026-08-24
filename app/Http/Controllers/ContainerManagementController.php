@@ -261,7 +261,7 @@ class ContainerManagementController extends Controller
             ];
 
             $user = Auth::user();
-            if ($user->is_superadmin == 1) {
+            if ($user->isSuperAdmin()) {
                 $destinations = DB::table('branches')
                     ->orderBy('name')
                     ->get();

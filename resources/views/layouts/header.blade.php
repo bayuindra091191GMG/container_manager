@@ -30,7 +30,7 @@
         <li class="profile-nav onhover-dropdown pe-0 py-0">
           <div class="media profile-media"><img class="b-r-10" src="{{ asset('assets/images/dashboard/profile.png') }}" alt="">
             <div class="media-body"><span>{{ auth()->user()->name }}</span>
-              <p class="mb-0 font-roboto">{{ auth()->user()->is_superadmin ? 'Superadmin' : auth()->user()->hierarchy->name }} <i class="middle fa fa-angle-down"></i></p>
+              <p class="mb-0 font-roboto">{{ auth()->user()->getRoleNames()->join(', ') }} <i class="middle fa fa-angle-down"></i></p>
             </div>
           </div>
           <ul class="profile-dropdown onhover-show-div">

@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Akses Menu')
@@ -55,16 +54,20 @@
 
                     <div class="row mb-3 align-items-center">
                         <div class="col-3">
-                            <label class="form-label">Level</label>
-                            <select2 url="{{ route('level.select2') }}" v-model="hierarchy" :value="hierarchy" class="form-select"
-                                name="hierarchy_id" placeholder="Pick Level" required :disabled="loading"></select2>
+                            <label class="form-label">Role</label>
+                            <select v-model="role" name="role_id" class="form-select" required :disabled="loading">
+                                <option value="">Pick Role</option>
+                                @foreach ($roles as $availableRole)
+                                    <option value="{{ $availableRole->id }}">{{ $availableRole->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-auto">
                             <h5><i class="fa fa-fw fa-spin fa-circle-o-notch" v-if="loading"></i></h5>
                         </div>
                     </div>
 
-                    <fieldset :disabled="loading || hierarchy == ''">
+                    <fieldset :disabled="loading || role == ''">
                         <div class="d-flex flex-row justify-content-between align-items-center mb-2">
                             <p class="m-0">Menu</p>
                             <div class="d-flex flex-row">
@@ -124,7 +127,7 @@
             el: "#vue-container",
             data: {
                 menus: @json($menus),
-                hierarchy: '',
+                role: '',
                 loading: false,
             },
             methods: {
@@ -161,8 +164,8 @@
 
             },
             watch: {
-                hierarchy(){
-                    if(this.hierarchy != ''){
+                role(){
+                    if(this.role != ''){
                         this.loading = true;
 
                         let app = this;
@@ -170,7 +173,7 @@
                             method: 'get',
                             url: '{!! route('access.permission') !!}',
                             params: {
-                                id: app.hierarchy
+                                id: app.role
                             },
                         }).then(function (response){
                             if(response.data.success){
@@ -180,7 +183,7 @@
                                 }, 10);
                             }
                             else {
-                                app.hierarchy = '';
+                                app.role = '';
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',

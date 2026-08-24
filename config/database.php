@@ -83,19 +83,6 @@ return [
             ]) : [],
         ],
 
-        'oracle' => [
-            'driver' => 'oracle',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST_ORACLE', '127.0.0.1'),
-            'port' => env('DB_PORT_ORACLE', '1521'),
-            'database' => env('DB_DATABASE_ORACLE', 'forge'),
-            'username' => env('DB_USERNAME_ORACLE', 'forge'),
-            'password' => env('DB_PASSWORD_ORACLE', ''),
-            // 'charset' => 'utf8mb4',
-            // 'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-        ],
-
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),

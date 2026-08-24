@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Ubah Hirearki')
@@ -126,7 +125,7 @@
         let vueComponent = new Vue({
             el: "#vue-container",
             data: {
-                branch: '{{ old('branch_id') ?? (auth()->user()->is_superadmin ? $hierarchy->branch_id : '') }}',
+                branch: '{{ old('branch_id') ?? (auth()->user()->isSuperAdmin() ? $hierarchy->branch_id : '') }}',
                 autonumericFormat: {
                     digitGroupSeparator: '.',
                     decimalCharacter: ',',

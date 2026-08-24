@@ -67,7 +67,7 @@ class ShippingInstructionController extends Controller
         }
 
         $admin = Auth::user();
-        if ($admin->is_superadmin == 1) {
+        if ($admin->isSuperAdmin()) {
             $destinations = DB::table('branches')
                 ->orderBy('name')
                 ->get();
@@ -101,7 +101,7 @@ class ShippingInstructionController extends Controller
                 DB::raw('SUM(status_id = 18) as total_received'));
         // ->where('created_at', '>', Carbon::today('Asia/Jakarta')->subMonths(6));
 
-        if ($admin->is_superadmin != 1) {
+        if (! $admin->isSuperAdmin()) {
             $branchIdArr[] = $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
                 $branchIdArr[] = $adminBranch->id;
@@ -128,7 +128,7 @@ class ShippingInstructionController extends Controller
                 DB::raw('SUM(shipping_instruction_monitors.status_id = 18) as total_received'));
         // ->where('shipping_instruction_headers.created_at', '>', Carbon::today('Asia/Jakarta')->subMonths(6));
 
-        if ($admin->is_superadmin != 1) {
+        if (! $admin->isSuperAdmin()) {
             $branchIdArr[] = $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
                 $branchIdArr[] = $adminBranch->id;
@@ -185,7 +185,7 @@ class ShippingInstructionController extends Controller
                 'shipping_instruction_headers.total_received_cont as total_received_cont',
                 'statuses.display as status_display');
 
-        if ($admin->is_superadmin != 1) {
+        if (! $admin->isSuperAdmin()) {
             $branchIdArr[] = $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
                 $branchIdArr[] = $adminBranch->id;
@@ -367,7 +367,7 @@ class ShippingInstructionController extends Controller
                 ]), 200);
             }
 
-            $newSiHeader = new ShippingInstructionHeader();
+            $newSiHeader = new ShippingInstructionHeader;
             $newSiHeader->code = AutoNumberUtility::generateAutonumber('SI');
             $newSiHeader->shipper = 'PT. JUI SHIN INDONESIA';
             $newSiHeader->vessel_name = strtoupper($request->input('vessel'));
@@ -391,7 +391,7 @@ class ShippingInstructionController extends Controller
             if (! empty($details)) {
                 foreach ($details as $detail) {
                     if (! empty($detail['do_id'])) {
-                        $newSiDetail = new ShippingInstructionDetail();
+                        $newSiDetail = new ShippingInstructionDetail;
                         $newSiDetail->header_id = $newSiHeader->id;
                         $newSiDetail->header_code = $newSiHeader->code;
                         $newSiDetail->delivery_type = $detail['delivery_type'];
@@ -471,7 +471,7 @@ class ShippingInstructionController extends Controller
             if (! empty($detailsWt)) {
                 foreach ($detailsWt as $detail) {
                     if (! empty($detail['do_id'])) {
-                        $newSiDetail = new ShippingInstructionDetail();
+                        $newSiDetail = new ShippingInstructionDetail;
                         $newSiDetail->header_id = $newSiHeader->id;
                         $newSiDetail->header_code = $newSiHeader->code;
                         $newSiDetail->delivery_type = $detail['delivery_type'];
@@ -593,7 +593,7 @@ class ShippingInstructionController extends Controller
 
     public function storeMonitor(ShippingInstructionDetail $siDetail, $containerCode, $divider)
     {
-        $newMonitor = new ShippingInstructionMonitor();
+        $newMonitor = new ShippingInstructionMonitor;
         $newMonitor->header_id = $siDetail->header_id;
         $newMonitor->header_code = $siDetail->header_code;
         $newMonitor->consignee_id = $siDetail->consignee_id;
@@ -654,7 +654,7 @@ class ShippingInstructionController extends Controller
 
     public function storeMonitorWt(ShippingInstructionDetail $siDetail, $containerCode, $qty, $trucking, $remark)
     {
-        $newMonitor = new ShippingInstructionMonitor();
+        $newMonitor = new ShippingInstructionMonitor;
         $newMonitor->header_id = $siDetail->header_id;
         $newMonitor->header_code = $siDetail->header_code;
 
@@ -732,7 +732,7 @@ class ShippingInstructionController extends Controller
         }
 
         // Validate admin permission
-        if ($admin->is_superadmin == 0) {
+        if (! $admin->isSuperAdmin()) {
             $branchIdArr[] = $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
                 $branchIdArr[] = $adminBranch->id;
@@ -1060,7 +1060,7 @@ class ShippingInstructionController extends Controller
                         $doHeader->save();
                     } else {
                         if (! empty($detail['do_id'])) {
-                            $newSiDetail = new ShippingInstructionDetail();
+                            $newSiDetail = new ShippingInstructionDetail;
                             $newSiDetail->header_id = $id;
                             $newSiDetail->header_code = $siHeader->code;
                             $newSiDetail->delivery_type = $detail['delivery_type'];
@@ -1168,7 +1168,7 @@ class ShippingInstructionController extends Controller
             if (! empty($detailsWt)) {
                 foreach ($detailsWt as $detail) {
                     if (! empty($detail['do_id'])) {
-                        $newSiDetail = new ShippingInstructionDetail();
+                        $newSiDetail = new ShippingInstructionDetail;
                         $newSiDetail->header_id = $siHeader->id;
                         $newSiDetail->header_code = $siHeader->code;
                         $newSiDetail->delivery_type = $detail['delivery_type'];
@@ -1292,7 +1292,7 @@ class ShippingInstructionController extends Controller
 
         // Validate admin permission
         $admin = Auth::user();
-        if ($admin->is_superadmin == 0) {
+        if (! $admin->isSuperAdmin()) {
             $branchIdArr[] = $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
                 $branchIdArr[] = $adminBranch->id;
@@ -1436,7 +1436,7 @@ class ShippingInstructionController extends Controller
         $admin = Auth::user();
 
         // Validate admin permission
-        if ($admin->is_superadmin == 0) {
+        if (! $admin->isSuperAdmin()) {
             $branchIdArr[] = $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
                 $branchIdArr[] = $adminBranch->id;
@@ -1654,7 +1654,7 @@ class ShippingInstructionController extends Controller
                 $containerMaster->save();
 
                 // Save log
-                $newLog = new ContainerLog();
+                $newLog = new ContainerLog;
                 $newLog->container_id = $containerMaster->id;
                 $newLog->reference_id = $id;
                 $newLog->reference_code = $siHeader->code;
@@ -2055,7 +2055,7 @@ class ShippingInstructionController extends Controller
             $admin = Auth::user();
 
             // Validate admin permission
-            if ($admin->is_superadmin == 0) {
+            if (! $admin->isSuperAdmin()) {
                 $branchIdArr[] = $admin->branch_id;
                 foreach ($admin->branches as $adminBranch) {
                     $branchIdArr[] = $adminBranch->id;
@@ -2152,7 +2152,7 @@ class ShippingInstructionController extends Controller
             $voidedDoId = $request->input('voided_do_id');
             $doHeader = DoHeader::find($voidedDoId);
 
-            //dd($voidedDoId);
+            // dd($voidedDoId);
 
             // Remove from SI details and monitors
             if (! empty($doHeader->container1_code)) {
@@ -2232,10 +2232,10 @@ class ShippingInstructionController extends Controller
                 return redirect()->route('shipping_instruction');
             }
 
-            //check folder exists
+            // check folder exists
             $tmpPath = Storage::disk('si_documents')->path($siHeader->code);
             if (! Storage::exists($tmpPath)) {
-                //create the folder
+                // create the folder
                 Storage::disk('si_documents')->makeDirectory($siHeader->code);
             }
 
@@ -2244,7 +2244,7 @@ class ShippingInstructionController extends Controller
                 $ext = $file->getClientOriginalExtension();
                 $fileName = $file->getClientOriginalName();
 
-                $newUpload = new ShippingInstructionUpload();
+                $newUpload = new ShippingInstructionUpload;
                 $newUpload->header_id = $siHeader->id;
                 $newUpload->filename = $fileName;
                 $newUpload->ext = $ext;

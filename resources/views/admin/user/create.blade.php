@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Add New User')
@@ -61,11 +60,15 @@
 
                     <div class="row mb-3">
                         <div class="col-2">
-                            <label class="form-label">Level <span class="text-danger">*</span></label>
+                            <label class="form-label">Role <span class="text-danger">*</span></label>
                         </div>
                         <div class="col-3">
-                            <select2 url="{{ route('level.select2') }}" v-model="level" :value="level" class="form-select"
-                                name="hierarchy_id" placeholder="Pick Level" required></select2>
+                            <select id="role_id" name="role_id" class="form-select" required>
+                                <option value="">Pick Role</option>
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->id }}" @selected(old('role_id') == $role->id)>{{ $role->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 
@@ -138,40 +141,9 @@
 @endsection
 
 @section('script')
-    <script src="{{ asset('js\axios.min.js') }}"></script>
-    <script src="{{ asset('js\vue.js') }}"></script>
     <script src="{{ asset('assets/js/select2/select2.full.min.js') }}"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/autonumeric@4.5.4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-autonumeric@1.2.6/dist/vue-autonumeric.min.js"></script>
 
-    <script type="text/x-template" id="select2-template">
-        <select>
-            <slot></slot>
-        </select>
-    </script>
-    <script src="{{ asset('js/vueComponent-select2.js') }}"></script>
-
-    <script>
-        let vueComponent = new Vue({
-            el: "#vue-container",
-            data: {
-                level: '{{ old('hierarchy_id') ?? '' }}',
-            },
-            methods: {
-
-            },
-            computed: {
-
-            },
-            watch: {
-
-            },
-            mounted() {
-
-            }
-        });
-    </script>
 
     <script>
         $('#main_branch').select2();

@@ -186,7 +186,7 @@
                         </button>
                     </div>
                     <div class="col-sm-4 col-12 text-end">
-                        @if($user->is_superadmin == 1)
+                        @if($user->isSuperAdmin())
                             <a href="{{ route('container.operation', ['status' => 'received']) }}" class="btn btn-sm btn-secondary">Return to Depo</a>
                         @endif
                     </div>

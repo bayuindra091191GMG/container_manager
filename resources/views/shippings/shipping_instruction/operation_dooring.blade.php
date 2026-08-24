@@ -55,8 +55,8 @@
                                     {{ csrf_field() }}
                                     <div class="row my-3">
                                         <div class="col-12 text-end">
-                                            @if(auth()->user()->hierarchy->hasPermissionTo('si.edit-cabang')
-                                                || auth()->user()->is_superadmin)
+                                            @if(auth()->user()->can('si.edit-cabang')
+                                                || auth()->user()->isSuperAdmin())
                                                 <button type="button" class="btn btn-success btn-sm"
                                                     onclick="popConfirmModal()"
                                                     :disabled="validate()">SET TO RECEIVED</button>
@@ -74,8 +74,8 @@
                                                 <table class="table table-bordered table-sm text-nowrap">
                                                     <thead>
                                                         <tr class="text-center">
-                                                            @if(auth()->user()->hierarchy->hasPermissionTo('si.edit-cabang')
-                                                                    || auth()->user()->is_superadmin)
+                                                            @if(auth()->user()->can('si.edit-cabang')
+                                                                    || auth()->user()->isSuperAdmin())
                                                                 <th>
                                                                     <input type="checkbox" class="form-checkbox"
                                                                         v-on:change="checkAll($event)" />
@@ -103,8 +103,8 @@
                                                     <tbody>
                                                         <tr v-for="(detail, index) in detailList" :key="detail.id">
                                                             <td class="text-center">
-                                                                @if(auth()->user()->hierarchy->hasPermissionTo('si.edit-cabang')
-                                                                        || auth()->user()->is_superadmin)
+                                                                @if(auth()->user()->can('si.edit-cabang')
+                                                                        || auth()->user()->isSuperAdmin())
                                                                     <input type="checkbox" class="form-checkbox"
                                                                         name="checkboxes[]"
                                                                         :checked="detail.checked"

@@ -40,30 +40,30 @@
                             <a class="btn btn-dark btn-sm" href="{{ route('shipping_instruction') }}">Back</a>
                         </div>
                         <div class="col-sm-8 col-12 text-end">
-                            @if ($siHeader->status_id === 7 && (auth()->user()->hierarchy->hasPermissionTo('si.edit-si') || auth()->user()->is_superadmin))
+                            @if ($siHeader->status_id === 7 && (auth()->user()->can('si.edit-si') || auth()->user()->isSuperAdmin()))
                                 <button type="button" class="btn btn-primary btn-sm" onclick="updateStatus(8);">Set to Sailing</button>
                                 &nbsp;
                             @endif
-                            @if ($siHeader->status_id === 8 && (auth()->user()->hierarchy->hasPermissionTo('si.edit-cabang') || auth()->user()->is_superadmin))
+                            @if ($siHeader->status_id === 8 && (auth()->user()->can('si.edit-cabang') || auth()->user()->isSuperAdmin()))
                                 <button type="button" class="btn btn-primary btn-sm" onclick="updateStatus(9);">Set to Berthing</button>
                                 &nbsp;
                             @endif
                             @if (($siHeader->status_id === 9 ||
                                     $siHeader->status_id === 13 ||
                                     $siHeader->status_id === 18) &&
-                                    (auth()->user()->hierarchy->hasPermissionTo('si.edit-cabang') ||
-                                    auth()->user()->is_superadmin))
+                                    (auth()->user()->can('si.edit-cabang') ||
+                                    auth()->user()->isSuperAdmin()))
                                 <button type="button" class="btn btn-primary btn-sm" onclick="editBerthingDate();">Edit Berthing Date</button>
                                 &nbsp;
                             @endif
                             @if (($siHeader->status_id === 8) &&
-                                    (auth()->user()->hierarchy->hasPermissionTo('si.edit-si') ||
-                                    auth()->user()->is_superadmin))
+                                    (auth()->user()->can('si.edit-si') ||
+                                    auth()->user()->isSuperAdmin()))
                                 <button type="button" class="btn btn-primary btn-sm" onclick="editSailingDate();">Edit Sailing Date</button>
                                 &nbsp;
                             @endif
                             @if (($siHeader->status_id === 7 || $siHeader->status_id === 8 ) &&
-                                    (auth()->user()->hierarchy->hasPermissionTo('si.edit-si') || auth()->user()->is_superadmin))
+                                    (auth()->user()->can('si.edit-si') || auth()->user()->isSuperAdmin()))
                                 <a class="btn btn-secondary btn-sm" href="{{ route('shipping_instruction.edit', ['id' => $siHeader->id]) }}">Edit</a>
                                 &nbsp;
                             @endif
@@ -72,13 +72,13 @@
                                 &nbsp;
                             @endif
                             @if (($siHeader->status_id === 18) &&
-                                    (auth()->user()->hierarchy->hasPermissionTo('si.document-download') ||
-                                    auth()->user()->is_superadmin))
+                                    (auth()->user()->can('si.document-download') ||
+                                    auth()->user()->isSuperAdmin()))
                                 <a class="btn btn-primary btn-sm" href="{{ route('shipping_instruction.upload.view', ['id' => $siHeader->id]) }}" target="_blank">Documents</a>
                                 &nbsp;
                             @endif
                             @if (($siHeader->status_id === 7 || $siHeader->status_id === 8) &&
-                                    (auth()->user()->hierarchy->hasPermissionTo('si.delete') || auth()->user()->is_superadmin))
+                                    (auth()->user()->can('si.delete') || auth()->user()->isSuperAdmin()))
                                 <button type="button" class="btn btn-danger btn-sm" onclick="voidDocument(9);">Void</button>
                                 &nbsp;
                             @endif
@@ -86,7 +86,7 @@
                     </div>
                     <div class="row justify-content-end mb-4">
                         <div class="col-12 text-end">
-                            @if((auth()->user()->hierarchy->hasPermissionTo('si.print') || auth()->user()->is_superadmin))
+                            @if((auth()->user()->can('si.print') || auth()->user()->isSuperAdmin()))
                                 <a class="btn btn-success btn-sm" href="{{ route('shipping_instruction.final.export', ['id' => $siHeader->id]) }}" target="_blank">Export SI Final</a>
                                 &nbsp;
                                 <a class="btn btn-success btn-sm" href="{{ route('shipping_instruction.export', ['id' => $siHeader->id]) }}" target="_blank">Export Cement Report</a>
@@ -272,7 +272,7 @@
                                                             <th>QTY</th>
                                                             <th>REMARK</th>
                                                             @if(($siHeader->status_id == 7 || $siHeader->status_id == 8) &&
-                                                                (auth()->user()->hierarchy->hasPermissionTo('si.delete') || auth()->user()->is_superadmin))
+                                                                (auth()->user()->can('si.delete') || auth()->user()->isSuperAdmin()))
                                                                 <th>VOID?</th>
                                                             @endif
                                                         </tr>
@@ -314,9 +314,9 @@
                                                             </td>
 
                                                             @if(($siHeader->status_id == 7 || $siHeader->status_id == 8) &&
-                                                                (auth()->user()->hierarchy->hasPermissionTo('si.delete') ||
-                                                                    auth()->user()->hierarchy->hasPermissionTo('si.edit-si') ||
-                                                                    auth()->user()->is_superadmin))
+                                                                (auth()->user()->can('si.delete') ||
+                                                                    auth()->user()->can('si.edit-si') ||
+                                                                    auth()->user()->isSuperAdmin()))
                                                                 <td class="text-center">
                                                                     <button type="button" class="btn btn-danger btn-xs" v-on:click="voidEach(detail.do_id)">
                                                                         <i class="fa fa-ban"></i>

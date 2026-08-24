@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Warehouse')
@@ -35,7 +34,7 @@
             <div class="card-body">
                 <div class="row mb-3 justify-content-end">
                     <div class="col-auto">
-                        @if(auth()->user()->is_superadmin || auth()->user()->hierarchy->hasPermissionTo('warehouse.add'))
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->can('warehouse.add'))
                             <a class="btn btn-sm btn-primary" href="{{ route('warehouse.create') }}"><i class="fa fa-fw fa-plus"></i></a>
                         @endif
                     </div>

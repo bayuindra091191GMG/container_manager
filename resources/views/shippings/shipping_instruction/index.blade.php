@@ -122,7 +122,7 @@
             <div class="card-body">
                 <div class="row mb-2 justify-content-end">
                     <div class="col-auto">
-                        @if(auth()->user()->hierarchy->hasPermissionTo('si.add'))
+                        @if(auth()->user()->can('si.add'))
                             <a class="btn btn-primary" href="{{ route('shipping_instruction.create') }}"><i
                                 class="fa fa-fw fa-plus"></i></a>
                         @endif

@@ -2,70 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Hierarchy;
-use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class MenuAccessController extends Controller
 {
-    public function index()
+    private function permissionGroups(Role $role): array
     {
-        $data = Menu::orderBy('sequence')->get();
-
-        $menus = [];
-        foreach ($data as $d){
-            $actData = explode(',', $d->actions);
-            $actions = [];
-            foreach ($actData as $action){
-                $actions[] = [
-                    'code' => $d->code.'.'.$action,
-                    'name' => str_replace('_', ' ', ucfirst($action)),
-                    'checked' => false,
+        return Permission::query()
+            ->where('guard_name', 'web')
+            ->orderBy('name')
+            ->get()
+            ->groupBy(fn (Permission $permission) => Str::before($permission->name, '.'))
+            ->map(function ($permissions, $code) use ($role) {
+                return [
+                    'id' => $code,
+                    'name' => Str::headline($code),
+                    'action' => $permissions->map(fn (Permission $permission) => [
+                        'code' => $permission->name,
+                        'name' => Str::headline(Str::after($permission->name, '.')),
+                        'checked' => $role->hasPermissionTo($permission->name),
+                    ])->values()->all(),
                 ];
-            }
-
-            $menus[] = [
-                'id' => $d->code,
-                'name' => $d->name,
-                'action' => $actions
-            ];
-        }
-
-        return view('admin.menu_access.index', compact('menus'));
+            })
+            ->values()
+            ->all();
     }
 
-    public function getPermission(Request $request){
+    public function index()
+    {
+        $roles = Role::where('guard_name', 'web')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.menu_access.index', [
+            'roles' => $roles,
+            'menus' => [],
+        ]);
+    }
+
+    public function getPermission(Request $request)
+    {
         try {
-            $hierarchy = Hierarchy::find($request->get('id'));
-
-            $data = Menu::orderBy('sequence')->get();
-
-            $menus = [];
-            foreach ($data as $d){
-                $actData = explode(',', $d->actions);
-                $actions = [];
-                foreach ($actData as $action){
-                    $actions[] = [
-                        'code' => $d->code.'.'.$action,
-                        'name' => str_replace('_', ' ', ucfirst($action)),
-                        'checked' => $hierarchy->hasPermissionTo($d->code.'.'.$action),
-                    ];
-                }
-
-                $menus[] = [
-                    'id' => $d->code,
-                    'name' => $d->name,
-                    'action' => $actions
-                ];
-            }
+            $role = Role::where('guard_name', 'web')
+                ->findOrFail($request->integer('id'));
 
             return response([
                 'success' => true,
-                'menus' => $menus,
+                'menus' => $this->permissionGroups($role),
             ]);
-        } catch (\Exception $ex){
+        } catch (\Exception $ex) {
             Log::channel('menu_access')->error($ex);
 
             return response([
@@ -74,20 +64,27 @@ class MenuAccessController extends Controller
         }
     }
 
-    public function setPermission(Request $request){
+    public function setPermission(Request $request)
+    {
+        $validated = $request->validate([
+            'role_id' => ['required', 'integer', 'exists:roles,id'],
+            'permission' => ['nullable', 'array'],
+            'permission.*' => ['string', 'exists:permissions,name'],
+        ]);
+
         try {
-            $hierarchy = Hierarchy::find($request->input('hierarchy_id'));
+            $role = Role::where('guard_name', 'web')
+                ->findOrFail($validated['role_id']);
+            $role->syncPermissions($validated['permission'] ?? []);
 
-            $hierarchy->syncPermissions($request->input('permission'));
+            Session::flash('success', 'Successfully updated role permissions!');
 
-            Session::flash('success', 'Successfully updated menu access privileges!');
-            return \redirect()->back();
-        } catch (\Exception $ex){
+            return redirect()->back();
+        } catch (\Exception $ex) {
             Log::channel('menu_access')->error($ex);
 
-            return \redirect()->back()->withErrors([
-                'Terjadi kesalahan di dalam server = '. $ex->getMessage()
-                // 'Terjadi kesalahan di dalam server!'
+            return redirect()->back()->withErrors([
+                'Terjadi kesalahan di dalam server = '.$ex->getMessage(),
             ]);
         }
     }

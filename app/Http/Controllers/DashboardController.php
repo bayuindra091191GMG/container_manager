@@ -35,7 +35,7 @@ class DashboardController extends Controller
         //         ->get();
 
         $admin = Auth::user();
-        if ($admin->is_superadmin == 1) {
+        if ($admin->isSuperAdmin()) {
             $destinations = DB::table('branches')
                 ->orderBy('name')
                 ->get();
@@ -95,7 +95,7 @@ class DashboardController extends Controller
                 ->whereNotNull('si_destination_id');
 
             $admin = Auth::user();
-            if ($admin->is_superadmin != 1) {
+            if (! $admin->isSuperAdmin()) {
                 $branchIdArr[] = $admin->branch_id;
                 foreach ($admin->branches as $adminBranch) {
                     $branchIdArr[] = $adminBranch->id;
@@ -276,7 +276,7 @@ class DashboardController extends Controller
                 ->where('created_at', '>', Carbon::today('Asia/Jakarta')->subMonths(3));
 
             $admin = Auth::user();
-            if ($admin->is_superadmin != 1) {
+            if (! $admin->isSuperAdmin()) {
                 $branchIdArr[] = $admin->branch_id;
                 foreach ($admin->branches as $adminBranch) {
                     $branchIdArr[] = $adminBranch->id;
@@ -316,7 +316,7 @@ class DashboardController extends Controller
                 ->where('shipping_instruction_headers.created_at', '>', Carbon::today('Asia/Jakarta')->subMonths(3));
 
             $admin = Auth::user();
-            if ($admin->is_superadmin != 1) {
+            if (! $admin->isSuperAdmin()) {
                 $branchIdArr[] = $admin->branch_id;
                 foreach ($admin->branches as $adminBranch) {
                     $branchIdArr[] = $adminBranch->id;

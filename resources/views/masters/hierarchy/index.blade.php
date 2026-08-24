@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Hierarki')
@@ -36,7 +35,7 @@
             <div class="card-body">
                 <div class="row mb-3 justify-content-end">
                     <div class="col-auto">
-                        @if(auth()->user()->is_superadmin || auth()->user()->hierarchy->hasPermissionTo('position.add'))
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->can('hierarchy.add'))
                             <a class="btn btn-sm btn-primary" href="{{ route('hierarchy.create') }}"><i class="fa fa-fw fa-plus"></i></a>
                         @endif
                     </div>
@@ -48,7 +47,7 @@
                         <tr>
                             <th style="width: 20%"></th>
                             <th class="text-center">Kode</th>
-                            @if(auth()->user()->is_superadmin)
+                            @if(auth()->user()->isSuperAdmin())
                                 <th class="text-center">Cabang</th>
                             @endif
                             <th class="text-center">Nama</th>
@@ -124,7 +123,7 @@
             columns: [
                 { data: 'action', name: 'action', orderable: false, searchable: false, class: 'text-center'},
                 { data: 'code', name: 'hirearchies.code', class: 'text-center'},
-                    @if(auth()->user()->is_superadmin)
+                    @if(auth()->user()->isSuperAdmin())
                 { data: 'branch', name: 'branches.name', class: 'text-center'},
                     @endif
                 { data: 'name', name: 'hirearchies.name', class: 'text-center'},

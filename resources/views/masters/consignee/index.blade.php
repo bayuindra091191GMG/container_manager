@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Consignee')
@@ -39,7 +38,7 @@
             <div class="card-body">
                 <div class="row mb-3 justify-content-end">
                     <div class="col-auto">
-                        @if(auth()->user()->is_superadmin || auth()->user()->hierarchy->hasPermissionTo('consignee.add'))
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->can('consignee.add'))
                             <a class="btn btn-sm btn-primary" href="{{ route('consignee.create') }}"><i class="fa fa-fw fa-plus"></i></a>
                         @endif
                     </div>

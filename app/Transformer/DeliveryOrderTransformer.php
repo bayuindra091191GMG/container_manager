@@ -29,16 +29,16 @@ class DeliveryOrderTransformer extends TransformerAbstract
 
         $btn = '';
         if ($data->status_id != 21) {
-            if (Auth::user()->is_superadmin || Auth::user()->hierarchy->hasPermissionTo('do.show')) {
+            if (Auth::user()->isSuperAdmin() || Auth::user()->can('do.show')) {
                 $btn .= '<a class="btn btn-xs btn-info" href="'.route('delivery_order.show', $data->id).'"><i class="fa fa-fw fa-eye"></i></a>';
             }
 
             if (! $data->is_close) {
-                if (Auth::user()->is_superadmin || Auth::user()->hierarchy->hasPermissionTo('do.edit')) {
+                if (Auth::user()->isSuperAdmin() || Auth::user()->can('do.edit')) {
                     $btn .= '&nbsp;<a class="btn btn-xs btn-secondary" href="'.route('delivery_order.edit', $data->id).'"><i class="fa fa-fw fa-edit"></i></a>';
                 }
 
-                if (Auth::user()->is_superadmin || Auth::user()->hierarchy->hasPermissionTo('do.delete')) {
+                if (Auth::user()->isSuperAdmin() || Auth::user()->can('do.delete')) {
                     $btn .= '&nbsp;<button class="btn btn-xs btn-danger js-void-do" data-id="'.$data->id.'"><i class="fa fa-fw fa-trash"></i></button>';
                 }
             }

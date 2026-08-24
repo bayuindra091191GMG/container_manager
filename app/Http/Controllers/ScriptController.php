@@ -13,20 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class ScriptController extends Controller
 {
-    public function testOracle()
-    {
-        try {
-            $testQuery = DB::connection('oracle')
-                ->table('V_CMS')
-                ->take(5)
-                ->get();
-
-            dd($testQuery);
-        } catch (\Exception $ex) {
-            dd($ex);
-        }
-    }
-
     public function fillBranchDestinationId()
     {
         $doHeaders = DoHeader::all();
@@ -70,7 +56,7 @@ class ScriptController extends Controller
     public function simulateTimbanganIn(Request $request)
     {
         try {
-            $newTimbanganData = new TimbanganData();
+            $newTimbanganData = new TimbanganData;
             $newTimbanganData->branch_id = Auth::user()->branch_id ?? null;
             $newTimbanganData->code = AutoNumberUtility::generateAutonumber('TD');
             $newTimbanganData->container_no = $request->query('container_code');

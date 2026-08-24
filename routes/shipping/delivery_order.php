@@ -3,27 +3,27 @@
 use App\Http\Controllers\DeliveryOrderController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'delivery_order', 'middleware' => ['auth']], function (){
-    Route::group(['middleware' => ['check_permission:do.list']], function (){
+Route::group(['prefix' => 'delivery_order', 'middleware' => ['auth']], function () {
+    Route::group(['middleware' => ['permission:do.list']], function () {
         Route::get('/', [DeliveryOrderController::class, 'index'])->name('delivery_order');
         Route::get('/datatable', [DeliveryOrderController::class, 'datatable'])->name('delivery_order.datatable');
     });
 
-    Route::group(['middleware' => ['check_permission:do.add']], function (){
+    Route::group(['middleware' => ['permission:do.add']], function () {
         Route::get('/create', [DeliveryOrderController::class, 'create'])->name('delivery_order.create');
         Route::post('/store', [DeliveryOrderController::class, 'store'])->name('delivery_order.store');
     });
 
-    Route::group(['middleware' => ['check_permission:do.show']], function (){
+    Route::group(['middleware' => ['permission:do.show']], function () {
         Route::get('/show/{id}', [DeliveryOrderController::class, 'show'])->name('delivery_order.show');
     });
 
-    Route::group(['middleware' => ['check_permission:do.edit']], function (){
+    Route::group(['middleware' => ['permission:do.edit']], function () {
         Route::get('/edit/{id}', [DeliveryOrderController::class, 'edit'])->name('delivery_order.edit');
         Route::post('/update', [DeliveryOrderController::class, 'update'])->name('delivery_order.update');
     });
 
-    Route::group(['middleware' => ['check_permission:do.delete']], function (){
+    Route::group(['middleware' => ['permission:do.delete']], function () {
         Route::post('/void', [DeliveryOrderController::class, 'void'])->name('delivery_order.void');
     });
 

@@ -35,11 +35,11 @@
                         </a>
                     </li>
 
-                    @if (auth()->user()->is_superadmin ||
-                            auth()->user()->hierarchy->hasPermissionTo('branch.list')||
-                            auth()->user()->hierarchy->hasPermissionTo('warehouse.list')||
-                            auth()->user()->hierarchy->hasPermissionTo('distributor.list')||
-                            auth()->user()->hierarchy->hasPermissionTo('consignee.list'))
+                    @if (auth()->user()->isSuperAdmin() ||
+                            auth()->user()->can('branch.list')||
+                            auth()->user()->can('warehouse.list')||
+                            auth()->user()->can('distributor.list')||
+                            auth()->user()->can('consignee.list'))
                         <li class="sidebar-list">
                             <a class="sidebar-link sidebar-title" href="#">
                                 <i data-feather="database"></i>
@@ -47,26 +47,26 @@
                             </a>
                             <ul class="sidebar-submenu">
 
-                                @if (auth()->user()->is_superadmin ||
-                                        auth()->user()->hierarchy->hasPermissionTo('branch.list'))
+                                @if (auth()->user()->isSuperAdmin() ||
+                                        auth()->user()->can('branch.list'))
                                     <li>
                                         <a href="{{ route('branch') }}">Branch</a>
                                     </li>
                                 @endif
-                                @if (auth()->user()->is_superadmin ||
-                                        auth()->user()->hierarchy->hasPermissionTo('consignee.list'))
+                                @if (auth()->user()->isSuperAdmin() ||
+                                        auth()->user()->can('consignee.list'))
                                     <li>
                                         <a href="{{ route('consignee') }}">Consignee</a>
                                     </li>
                                 @endif
-                                @if (auth()->user()->is_superadmin ||
-                                        auth()->user()->hierarchy->hasPermissionTo('warehouse.list'))
+                                @if (auth()->user()->isSuperAdmin() ||
+                                        auth()->user()->can('warehouse.list'))
                                     <li>
                                         <a href="{{ route('warehouse') }}">Warehouse</a>
                                     </li>
                                 @endif
-                                @if (auth()->user()->is_superadmin ||
-                                        auth()->user()->hierarchy->hasPermissionTo('distributor.list'))
+                                @if (auth()->user()->isSuperAdmin() ||
+                                        auth()->user()->can('distributor.list'))
                                     <li>
                                         <a href="{{ route('distributor') }}">Distributor</a>
                                     </li>
@@ -74,37 +74,37 @@
                             </ul>
                         </li>
                     @endif
-                    @if (auth()->user()->is_superadmin ||
-                            auth()->user()->hierarchy->hasPermissionTo('si.list') ||
-                            auth()->user()->hierarchy->hasPermissionTo('do.list') ||
-                            auth()->user()->hierarchy->hasPermissionTo('container.list') ||
-                            auth()->user()->hierarchy->hasPermissionTo('container_history.list'))
+                    @if (auth()->user()->isSuperAdmin() ||
+                            auth()->user()->can('si.list') ||
+                            auth()->user()->can('do.list') ||
+                            auth()->user()->can('container.list') ||
+                            auth()->user()->can('container_history.list'))
                         <li class="sidebar-list">
                             <a class="sidebar-link sidebar-title" href="#">
                                 <i data-feather="monitor"></i>
                                 <span>Shipping Instruction</span>
                             </a>
                             <ul class="sidebar-submenu">
-                                @if (auth()->user()->is_superadmin ||
-                                        auth()->user()->hierarchy->hasPermissionTo('do.list'))
+                                @if (auth()->user()->isSuperAdmin() ||
+                                        auth()->user()->can('do.list'))
                                     <li>
                                         <a href="{{ route('delivery_order') }}">DO List</a>
                                     </li>
                                 @endif
-                                @if (auth()->user()->is_superadmin ||
-                                        auth()->user()->hierarchy->hasPermissionTo('si.list'))
+                                @if (auth()->user()->isSuperAdmin() ||
+                                        auth()->user()->can('si.list'))
                                     <li>
                                         <a href="{{ route('shipping_instruction') }}">SI List</a>
                                     </li>
                                 @endif
-                                @if (auth()->user()->is_superadmin ||
-                                        auth()->user()->hierarchy->hasPermissionTo('container.list'))
+                                @if (auth()->user()->isSuperAdmin() ||
+                                        auth()->user()->can('container.list'))
                                     <li>
                                         <a href="{{ route('container') }}">Container List</a>
                                     </li>
                                 @endif
-                                @if (auth()->user()->is_superadmin ||
-                                        auth()->user()->hierarchy->hasPermissionTo('container_history.list'))
+                                @if (auth()->user()->isSuperAdmin() ||
+                                        auth()->user()->can('container_history.list'))
                                     <li>
                                         <a href="{{ route('container_history') }}">Container History</a>
                                     </li>
@@ -112,8 +112,8 @@
                             </ul>
                         </li>
                     @endif
-                    @if (auth()->user()->is_superadmin ||
-                            auth()->user()->hierarchy->hasPermissionTo('warehouse_management.list'))
+                    @if (auth()->user()->isSuperAdmin() ||
+                            auth()->user()->can('warehouse_management.list'))
                         <li class="sidebar-list">
                             <a class="sidebar-link sidebar-title" href="#">
                                 <i data-feather="monitor"></i>
@@ -129,7 +129,7 @@
                             </ul>
                         </li>
                     @endif
-                    @if (auth()->user()->is_superadmin)
+                    @if (auth()->user()->isSuperAdmin())
                         <li class="sidebar-list">
                             <a class="sidebar-link sidebar-title" href="#">
                                 <i data-feather="settings"></i>

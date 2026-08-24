@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Edit Division')
@@ -118,7 +117,7 @@
         let vueComponent = new Vue({
             el: "#vue-container",
             data: {
-                branch: '{{ old('branch_id') ?? (auth()->user()->is_superadmin ? $division->branch_id : '') }}',
+                branch: '{{ old('branch_id') ?? (auth()->user()->isSuperAdmin() ? $division->branch_id : '') }}',
                 autonumericFormat: {
                     digitGroupSeparator: '.',
                     decimalCharacter: ',',

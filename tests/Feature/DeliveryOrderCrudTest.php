@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Http\Controllers\DeliveryOrderController;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -155,16 +157,16 @@ class DeliveryOrderCrudTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $user = new User();
+        $user = new User;
         $user->forceFill([
             'id' => 1,
-            'is_superadmin' => 1,
         ]);
         $user->exists = true;
+        $this->createSuperAdminRole();
         $this->actingAs($user);
     }
 
-    private function storeDo(array $overrides = []): \Illuminate\Http\JsonResponse
+    private function storeDo(array $overrides = []): JsonResponse
     {
         $payload = array_merge([
             'code' => 'DO-MANUAL-1',
@@ -282,7 +284,7 @@ class DeliveryOrderCrudTest extends TestCase
         $this->assertSame('CONT-OLD', $results[0]['text']);
     }
 
-    private function updateDo(array $overrides = []): \Illuminate\Http\RedirectResponse
+    private function updateDo(array $overrides = []): RedirectResponse
     {
         $headerId = DB::table('do_headers')->where('code', 'DO-MANUAL-1')->value('id');
         $payload = array_merge([

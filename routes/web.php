@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,25 +18,7 @@ use App\Http\Controllers\AuthController;
 Route::get('/login', [AuthController::class, 'loginView'])->name('login');
 Route::post('/login/submit', [AuthController::class, 'login'])->name('login.submit');
 
-Route::middleware(['auth'])->group(function (){
-    Route::get('/', [DashboardController::class, 'index'] )->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-});
-
-Route::get('/setrole', function (){
-    $permissions = [];
-    $menus = \App\Models\Menu::all();
-    foreach ($menus as $menu){
-        $actions = explode(',', $menu->actions);
-        foreach ($actions as $action){
-            $permissions[] = $menu->code . '.' . $action;
-
-            $check = \Spatie\Permission\Models\Permission::where('name', $menu->code . '.' . $action)->first();
-            if(!$check){
-                \Spatie\Permission\Models\Permission::create([
-                    'name' => $menu->code . '.' . $action,
-                ]);
-            }
-        }
-    }
 });

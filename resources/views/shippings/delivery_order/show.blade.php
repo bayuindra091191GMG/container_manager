@@ -28,7 +28,7 @@
                 <div class="row justify-content-end mb-3">
                     <div class="col-auto">
                         <a class="btn btn-sm btn-dark" href="{{ route('delivery_order') }}">Back</a>
-                        @if(!$doHeader->is_close && $doHeader->status_id != 21 && (auth()->user()->is_superadmin || auth()->user()->hierarchy->hasPermissionTo('do.edit')))
+                        @if(!$doHeader->is_close && $doHeader->status_id != 21 && (auth()->user()->isSuperAdmin() || auth()->user()->can('do.edit')))
                             &nbsp;<a class="btn btn-sm btn-secondary" href="{{ route('delivery_order.edit', ['id' => $doHeader->id]) }}">Edit</a>
                         @endif
                     </div>

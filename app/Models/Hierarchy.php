@@ -8,8 +8,6 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Class Hierarchy
@@ -21,25 +19,19 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $description
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- *
- * @package App\Models
  */
 class Hierarchy extends Model
 {
-    use HasRoles, HasPermissions;
+    protected $table = 'hierarchies';
 
-    protected $guard_name = 'web';
+    protected $casts = [
+        'branch_id' => 'int',
+    ];
 
-	protected $table = 'hierarchies';
-
-	protected $casts = [
-		'branch_id' => 'int'
-	];
-
-	protected $fillable = [
-		'branch_id',
-		'name',
-		'code',
-		'description'
-	];
+    protected $fillable = [
+        'branch_id',
+        'name',
+        'code',
+        'description',
+    ];
 }

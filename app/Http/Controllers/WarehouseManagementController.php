@@ -109,7 +109,7 @@ class WarehouseManagementController extends Controller
         //     $summary[] = (object)$summaryData;
         // }
 
-        if ($user->is_superadmin == 1) {
+        if ($user->isSuperAdmin()) {
             $destinations = DB::table('branches')
                 ->orderBy('name')
                 ->get();
@@ -282,7 +282,7 @@ class WarehouseManagementController extends Controller
                 ->whereBetween('container_datas.si_etd_date', [$start->toDateTimeString(), $end->toDateTimeString()]);
         }
 
-        if ($admin->is_superadmin != 1) {
+        if (! $admin->isSuperAdmin()) {
             $branchIdArr[] = $admin->branch_id;
             foreach ($admin->branches as $adminBranch) {
                 $branchIdArr[] = $adminBranch->id;
@@ -761,7 +761,7 @@ class WarehouseManagementController extends Controller
             $dataDB = ContainerBrokenImage::where('container_id', $request->get('id'))->get();
             $containerDB = ContainerData::find($request->get('id'));
 
-            $zip = new ZipArchive();
+            $zip = new ZipArchive;
             $zipname = 'Broken Container_'.$containerDB->code.'_'.date('YmdHi').'.zip';
 
             if (file_exists($zipname)) {

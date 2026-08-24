@@ -30,7 +30,7 @@
                 <label class="form-label" for="end_date">Destination</label>
                 <select class="form-select" id="h_destination_filter"
                     v-model="h_destination_filter" @change="onChangeHDestination($event)">
-                    @if($admin->is_superadmin)
+                    @if($admin->isSuperAdmin())
                         <option value="0" selected>-- Semua Cabang --</option>
                         @foreach ($destinations as $destination)
                             <option value="{{ $destination->id }}">{{ $destination->name }}</option>
@@ -531,7 +531,7 @@
         let app = new Vue({
             el: '#app',
             data: {
-                h_destination_filter: '{{ $admin->is_superadmin ? 0 : $admin->branch_id }}',
+                h_destination_filter: '{{ $admin->isSuperAdmin() ? 0 : $admin->branch_id }}',
                 loadingTotal3Demurrage: false,
                 total3Demurrage: 0,
                 loadingTotal7Demurrage: false,

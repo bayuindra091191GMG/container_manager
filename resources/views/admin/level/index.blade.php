@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 
 @section('title', 'CMS - Levels')
@@ -40,7 +39,7 @@
             <div class="card-body">
                 <div class="row mb-3 justify-content-end">
                     <div class="col-auto">
-                        @if(auth()->user()->is_superadmin || auth()->user()->hierarchy->hasPermissionTo('level.add'))
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->can('level.add'))
                             <a class="btn btn-sm btn-primary" href="{{ route('level.create') }}"><i class="fa fa-fw fa-plus"></i></a>
                         @endif
                     </div>
