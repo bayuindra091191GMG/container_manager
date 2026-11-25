@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -85,9 +84,5 @@ class PermissionSeeder extends Seeder
         $superAdmin = Role::findOrCreate('super-admin', 'web');
         Role::findOrCreate('staff', 'web');
         $superAdmin->syncPermissions($permissions);
-
-        User::where('username', 'developer')
-            ->firstOrFail()
-            ->syncRoles([$superAdmin]);
     }
 }

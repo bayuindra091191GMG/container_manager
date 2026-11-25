@@ -22,6 +22,7 @@ class DirectSpatieAuthorizationTest extends TestCase
             'database.default' => 'sqlite',
             'database.connections.sqlite.database' => ':memory:',
             'database.connections.sqlite.url' => null,
+            'cache.default' => 'array',
         ]);
 
         DB::purge('sqlite');
@@ -33,6 +34,8 @@ class DirectSpatieAuthorizationTest extends TestCase
             $table->string('name');
             $table->string('email');
             $table->string('password');
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
             $table->timestamps();
         });
 
@@ -75,6 +78,37 @@ class DirectSpatieAuthorizationTest extends TestCase
         });
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    public function test_database_seed_bootstraps_reference_data_without_changing_user_roles(): void
+    {
+        Schema::create('statuses', function (Blueprint $table): void {
+            $table->id();
+            $table->string('description')->nullable();
+            $table->string('display')->nullable();
+        });
+
+        $this->seed();
+
+        $this->assertDatabaseEmpty('users');
+        $this->assertSame(
+            [1, 2, 3, 4, 5, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 21],
+            DB::table('statuses')->orderBy('id')->pluck('id')->all(),
+        );
+        $this->assertDatabaseHas('statuses', ['id' => 1, 'description' => 'active', 'display' => 'ACTIVE']);
+        $this->assertDatabaseHas('statuses', ['id' => 18, 'display' => 'RECEIVED AT WH']);
+        $this->assertTrue(Role::findByName('super-admin', 'web')->hasPermissionTo('do.add'));
+
+        $user = User::factory()->create(['username' => 'developer']);
+        $user->assignRole(Role::findByName('staff', 'web'));
+        DB::table('statuses')->where('id', 1)->update(['display' => 'Enabled']);
+        DB::table('statuses')->where('id', 7)->delete();
+
+        $this->seed();
+
+        $this->assertSame(['staff'], $user->refresh()->getRoleNames()->all());
+        $this->assertDatabaseHas('statuses', ['id' => 1, 'display' => 'Enabled']);
+        $this->assertDatabaseHas('statuses', ['id' => 7, 'display' => 'PENDING']);
     }
 
     public function test_role_permission_is_checked_directly_on_user(): void
