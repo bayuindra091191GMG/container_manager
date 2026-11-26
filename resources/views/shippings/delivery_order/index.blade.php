@@ -103,7 +103,6 @@
                                 <th class="text-center">SHIPPING COMPANY</th>
                                 <th class="text-center">SHIP TO NAME</th>
                                 <th class="text-center">CONT 1</th>
-                                <th class="text-center">CONT 2</th>
                                 <th class="text-center">ANGKUTAN</th>
                                 <th class="text-center">STATUS</th>
                             </tr>
